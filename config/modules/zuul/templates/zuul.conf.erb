@@ -1,0 +1,33 @@
+[gearman]
+server=<%= gearman_server %>
+
+[gearman_server]
+start=<%= internal_gearman %>
+log_config=/etc/zuul/gearman-logging.conf
+
+[gerrit]
+server=<%= gerrit_server %>
+user=<%= gerrit_user %>
+sshkey=/var/lib/zuul/ssh/id_rsa
+
+[zuul]
+layout_config=/etc/zuul/layout.yaml
+log_config=/etc/zuul/logging.conf
+pidfile=/var/run/zuul/zuul.pid
+state_dir=/var/lib/zuul
+report_times=<%= report_times %>
+status_url=<%= status_url %>
+url_pattern=<%= url_pattern %>
+job_name_in_report=<%= job_name_in_report %>
+
+[merger]
+git_dir=/var/lib/zuul/git
+<% if git_name != "" -%>
+git_user_name=<%= git_name %>
+<% end -%>
+<% if git_email != "" -%>
+git_user_email=<%= git_email %>
+<% end -%>
+zuul_url=<%= zuul_url %>
+log_config=/etc/zuul/merger-logging.conf
+pidfile=/var/run/zuul-merger/zuul-merger.pid

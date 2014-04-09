@@ -1,0 +1,134 @@
+Format: 1.8
+Date: Wed, 19 Mar 2014 16:08:38 -0700
+Source: openvswitch
+Binary: openvswitch-datapath-source openvswitch-datapath-dkms openvswitch-common openvswitch-switch openvswitch-ipsec openvswitch-pki openvswitch-dbg python-openvswitch ovsdbmonitor openvswitch-test openvswitch-vtep
+Architecture: source amd64 all
+Version: 2.1.0-1
+Distribution: unstable
+Urgency: low
+Maintainer: Open vSwitch developers <dev@openvswitch.org>
+Changed-By: Open vSwitch team <dev@openvswitch.org>
+Description: 
+ openvswitch-common - Open vSwitch common components
+ openvswitch-datapath-dkms - Open vSwitch datapath module source - DKMS version
+ openvswitch-datapath-source - Open vSwitch datapath module source - module-assistant version
+ openvswitch-dbg - Debug symbols for Open vSwitch packages
+ openvswitch-ipsec - Open vSwitch GRE-over-IPsec support
+ openvswitch-pki - Open vSwitch public key infrastructure dependency package
+ openvswitch-switch - Open vSwitch switch implementations
+ openvswitch-test - Open vSwitch test package
+ openvswitch-vtep - Open vSwitch VTEP utilities
+ ovsdbmonitor - Open vSwitch graphical monitoring tool
+ python-openvswitch - Python bindings for Open vSwitch
+Changes: 
+ openvswitch (2.1.0-1) unstable; urgency=low
+ .
+    [ Open vSwitch team ]
+    * New upstream version
+    - Address prefix tracking support for flow tables.  New columns
+      "prefixes" in OVS-DB table "Flow_Table" controls which packet
+      header fields are used for address prefix tracking.  Prefix
+      tracking allows the classifier to skip rules with longer than
+      necessary prefixes, resulting in better wildcarding for datapath
+      flows.  Default configuration is to not use any fields for prefix
+      tracking.  However, if any flow tables contain both exact matches
+      and masked matches for IP address fields, OVS performance may be
+      increased by using this feature.
+      * As of now, the fields for which prefix lookup can be enabled
+        are: 'tun_id', 'tun_src', 'tun_dst', 'nw_src', 'nw_dst' (or
+        aliases 'ip_src' and 'ip_dst'), 'ipv6_src', and 'ipv6_dst'.
+        (Using this feature for 'tun_id' would only make sense if the
+        tunnel IDs have prefix structure similar to IP addresses.)
+      * There is a maximum number of fields that can be enabled for any
+        one flow table.  Currently this limit is 3.
+      * Examples:
+        $ ovs-vsctl set Bridge br0 flow_tables:0=@N1 -- \
+          --id=@N1 create Flow_Table name=table0
+        $ ovs-vsctl set Bridge br0 flow_tables:1=@N1 -- \
+          --id=@N1 create Flow_Table name=table1
+        $ ovs-vsctl set Flow_Table table0 prefixes=ip_dst,ip_src
+        $ ovs-vsctl set Flow_Table table1 prefixes=[]
+    - TCP flags matching: OVS now supports matching of TCP flags.  This
+      has an adverse performance impact when using OVS userspace 1.10
+      or older (no megaflows support) together with the new OVS kernel
+      module.  It is recommended that the kernel and userspace modules
+      both are upgraded at the same time.
+    - The default OpenFlow and OVSDB ports will change to
+      IANA-assigned numbers in a future release.  Consider updating
+      your installations to specify port numbers instead of using the
+      defaults.
+    - OpenFlow:
+      * The OpenFlow 1.1+ "Write-Actions" instruction is now supported.
+      * OVS limits the OpenFlow port numbers it assigns to port 32767 and
+        below, leaving port numbers above that range free for assignment
+        by the controller.
+      * ovs-vswitchd now honors changes to the "ofport_request" column
+        in the Interface table by changing the port's OpenFlow port
+        number.
+    - ovs-vswitchd.conf.db.5 man page will contain graphviz/dot
+      diagram only if graphviz package was installed at the build time.
+    - Support for Linux kernels up to 3.11
+    - ovs-dpctl:
+      The "show" command also displays mega flow mask stats.
+    - ovs-ofctl:
+      * New command "ofp-parse-pcap" to dump OpenFlow from PCAP files.
+    - ovs-controller has been renamed test-controller.  It is no longer
+      packaged or installed by default, because too many users assumed
+      incorrectly that ovs-controller was a necessary or desirable part
+      of an Open vSwitch deployment.
+    - Added vlog option to export to a UDP syslog sink.
+    - ovsdb-client:
+      * The "monitor" command can now monitor all tables in a database,
+        instead of being limited to a single table.
+    - The flow-eviction-threshold has been replaced by the flow-limit which is a
+      hard limit on the number of flows in the datapath.  It defaults to 200,000
+      flows.  OVS automatically adjusts this number depending on network
+      conditions.
+    * The openvswitch-controller package has been removed, because too many
+      users assumed incorrectly that ovs-controller was a necessary or
+      desirable part of an Open vSwitch deployment.
+Checksums-Sha1: 
+ 636b1dbfa9b3d4ef6e04b276ea2bbeb12c9124a5 1685 openvswitch_2.1.0-1.dsc
+ a42c36abc4710b303fc2617a078e2579a2741bed 3103784 openvswitch_2.1.0.orig.tar.gz
+ 70646028022f050bf22f47c9852976983331946c 60005 openvswitch_2.1.0-1.debian.tar.gz
+ 80c6db9e8e24550aaaf53989cfe5ddca9fd752f9 774948 openvswitch-common_2.1.0-1_amd64.deb
+ 16ecc5cd78d94a5fcf84b50e991e74c314d00426 1993434 openvswitch-switch_2.1.0-1_amd64.deb
+ f991b1fdc43d0551f7d4117d057f8bbaf4c5a1b4 36654 openvswitch-ipsec_2.1.0-1_amd64.deb
+ 2f5875721cc30b8dad7b51dae6ab7f5273de4cdc 7476776 openvswitch-dbg_2.1.0-1_amd64.deb
+ f3e1e5736d0f87bc277f1506ae4f9191ee216d65 211480 openvswitch-vtep_2.1.0-1_amd64.deb
+ 6925ea92bdb89b11e9d920e97e3ecb2249bbcddc 3145106 openvswitch-datapath-source_2.1.0-1_all.deb
+ 8e1d4e95bab648fb6e3bcbada3bf681c5b841d48 3071350 openvswitch-datapath-dkms_2.1.0-1_all.deb
+ 04276b421628eb42be340aa6e18481fe79a2c81d 30112 openvswitch-pki_2.1.0-1_all.deb
+ 96a000724a5c00b60cf0e0b1c93bfcfeff8afb1b 88938 python-openvswitch_2.1.0-1_all.deb
+ f383a1a025c5d9fa2b9a98afe8b3192becbe2ef4 55054 ovsdbmonitor_2.1.0-1_all.deb
+ 5070bbe163329f14daff9e444f1f746f61b9cf35 49654 openvswitch-test_2.1.0-1_all.deb
+Checksums-Sha256: 
+ 2bb8272356cb67064948a9b9e08a0010831195072549190b3862978641861c90 1685 openvswitch_2.1.0-1.dsc
+ a032fcc3becd98802b4816488cb3a2441b6b88b510ec28a929e756f948eb48c0 3103784 openvswitch_2.1.0.orig.tar.gz
+ 87bd0258c3dd555068dd1aba7b58c8197c3616877a0eb1ae09f250651d2a956b 60005 openvswitch_2.1.0-1.debian.tar.gz
+ 48cf5c2499e6cb6b84e5d713d4c79a668bc0acc223e272d3f73590d35e47c75c 774948 openvswitch-common_2.1.0-1_amd64.deb
+ 2900d82d7cbf2b1eec6f2883fdb3dba641ea9f449d36ded4a3cd15cfbe0ed81d 1993434 openvswitch-switch_2.1.0-1_amd64.deb
+ 5d596d6b01c897ae3fa8e9a808ca33453533b0f2f95d0948183926a5c83fa348 36654 openvswitch-ipsec_2.1.0-1_amd64.deb
+ 83baaed3f654da9114e5ba72ac221f8e7e15aea071804b6f74b677ca2865db5a 7476776 openvswitch-dbg_2.1.0-1_amd64.deb
+ c9f245aee2fa2fdc4d6c44e053c1e6a43aac00239b084d2c4a6551f1c489bcd2 211480 openvswitch-vtep_2.1.0-1_amd64.deb
+ 108e64413a00b1ae36e7188ae1d62ac73f20c7a62e79e53007c3a32228bed6ec 3145106 openvswitch-datapath-source_2.1.0-1_all.deb
+ cda6ea8e07342a4c52df18c45b9e623e67e17d7ebaa50a2b60c05c2eeaf3c184 3071350 openvswitch-datapath-dkms_2.1.0-1_all.deb
+ 1739d6d8129658f772dda98c04c6a6eeb73c333e5948688d5092d29ff87f49a9 30112 openvswitch-pki_2.1.0-1_all.deb
+ 9ce175005df59e2357cb53363cd745525f8ff92e19956f21e82d0f14e1171b5d 88938 python-openvswitch_2.1.0-1_all.deb
+ 9f51e512d8a11e2f1f1516a4b4294970a3825d785290d6ae1dfd9f1aa904eb70 55054 ovsdbmonitor_2.1.0-1_all.deb
+ 312f837868383c205d253228d1c90e2389a520bffbc933170e0d602d33ea7185 49654 openvswitch-test_2.1.0-1_all.deb
+Files: 
+ 256cadc31cd7c03b2de2126789625459 1685 net extra openvswitch_2.1.0-1.dsc
+ 7c5861b0ef7f3002c15c61be6f5066f2 3103784 net extra openvswitch_2.1.0.orig.tar.gz
+ ee22e9fe0dcf264d3df300268d427a40 60005 net extra openvswitch_2.1.0-1.debian.tar.gz
+ fef414b36d30bdef3240a8920b298903 774948 net extra openvswitch-common_2.1.0-1_amd64.deb
+ 7c3ba5371ec19ae84af284fa2af37068 1993434 net extra openvswitch-switch_2.1.0-1_amd64.deb
+ 96fafb014dcc21d7694471be6f75a522 36654 net extra openvswitch-ipsec_2.1.0-1_amd64.deb
+ c15f65959d4f4fe3cef891d15db7f40d 7476776 debug extra openvswitch-dbg_2.1.0-1_amd64.deb
+ 61d0e4eb01bb0713557fff04ba74d020 211480 net extra openvswitch-vtep_2.1.0-1_amd64.deb
+ 08d9668f0c44ea8240b9d24133caf35d 3145106 net extra openvswitch-datapath-source_2.1.0-1_all.deb
+ d16eb079262ca7bb630643bc5d272205 3071350 net extra openvswitch-datapath-dkms_2.1.0-1_all.deb
+ 3ea8a68b38b037958f74236311b25e46 30112 net extra openvswitch-pki_2.1.0-1_all.deb
+ b4b8dbf4e0a708c31ad62d198cb6e2e7 88938 python extra python-openvswitch_2.1.0-1_all.deb
+ cc88f00f6dc73c8650e857550c95ef01 55054 utils extra ovsdbmonitor_2.1.0-1_all.deb
+ 4a17aef233a8ffb9730b2aa34a6aa102 49654 net extra openvswitch-test_2.1.0-1_all.deb

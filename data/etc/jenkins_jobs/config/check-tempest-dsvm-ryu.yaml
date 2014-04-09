@@ -1,0 +1,89 @@
+- job-template:
+    name: 'check-tempest-dsvm-ryuplugin'
+    description: 'Third-party testing for Neutron Ryu plugin'
+    node: 'devstack_slave'
+
+    wrappers:
+      - timeout:
+          timeout: 60  # Timeout in *minutes*
+          fail: true  # A job run that exceeds the timeout will cause a failure
+      - timestamps
+
+    builders:
+      - shell: |
+          #!/bin/bash
+          rm -rf devstack-gate
+          ln -s ~/devstack-gate
+          sudo rm -rf /opt/stack/new/screen-logs /opt/stack/new/devstacklog.txt* /opt/stack/new/devstack/localrc /opt/stack/new/tempest/etc/tempest.conf /opt/stack/new/tempest/.testrepository /opt/stack/new/tempest/tempest.log /opt/stack/new/tempest/nosetests*.xml
+          sudo rm -rf /opt/stack/logs
+          sudo apt-get remove -y -qq python-crypto python-iso8601 python-netaddr python-cmd2
+          sudo ovs-vsctl --if-exists del-br br-int
+          sudo ovs-vsctl --if-exists del-br br-ex
+          sudo ovs-vsctl --if-exists del-br br-tun
+          sudo logrotate --force /etc/logrotate.conf
+          exit 0
+      - shell: |
+          #!/bin/bash -xe
+          export PYTHONUNBUFFERED=true
+          export DEVSTACK_GATE_TIMEOUT=60
+          export DEVSTACK_GATE_NEUTRON=1
+          export DEVSTACK_GATE_TEMPEST=1
+          export DEVSTACK_GATE_RYUPLUGIN=1
+          cp devstack-gate/devstack-vm-gate-wrap.sh ./safe-devstack-vm-gate-wrap.sh
+          ./safe-devstack-vm-gate-wrap.sh
+
+    publishers:
+      - devstack-logs  # In macros.yaml from os-ext-testing
+      - console-log  # In macros.yaml from os-ext-testing
+      - post-tasks:
+          - matches:
+              - log-text: ''
+                operator: AND
+            escalate-status: false
+            run-if-job-successful: false
+            script: /usr/local/bin/rebuild-node.sh
+
+- job-template:
+    name: 'check-tempest-dsvm-ofagent'
+    description: 'Third-party testing for Neutron OFAgent MD'
+    node: 'devstack_slave'
+
+    wrappers:
+      - timeout:
+          timeout: 60  # Timeout in *minutes*
+          fail: true  # A job run that exceeds the timeout will cause a failure
+      - timestamps
+
+    builders:
+      - shell: |
+          #!/bin/bash
+          rm -rf devstack-gate
+          ln -s ~/devstack-gate
+          sudo rm -rf /opt/stack/new/screen-logs /opt/stack/new/devstacklog.txt* /opt/stack/new/devstack/localrc /opt/stack/new/tempest/etc/tempest.conf /opt/stack/new/tempest/.testrepository /opt/stack/new/tempest/tempest.log /opt/stack/new/tempest/nosetests*.xml
+          sudo rm -rf /opt/stack/logs
+          sudo apt-get remove -y -qq python-crypto python-iso8601 python-netaddr python-cmd2
+          sudo ovs-vsctl --if-exists del-br br-int
+          sudo ovs-vsctl --if-exists del-br br-ex
+          sudo ovs-vsctl --if-exists del-br br-tun
+          sudo logrotate --force /etc/logrotate.conf
+          exit 0
+      - shell: |
+          #!/bin/bash -xe
+          export PYTHONUNBUFFERED=true
+          export DEVSTACK_GATE_TIMEOUT=60
+          export DEVSTACK_GATE_NEUTRON=1
+          export DEVSTACK_GATE_TEMPEST=1
+          export DEVSTACK_GATE_OFAGENT=1
+          cp devstack-gate/devstack-vm-gate-wrap.sh ./safe-devstack-vm-gate-wrap.sh
+          ./safe-devstack-vm-gate-wrap.sh
+
+    publishers:
+      - devstack-logs  # In macros.yaml from os-ext-testing
+      - console-log  # In macros.yaml from os-ext-testing
+      - post-tasks:
+          - matches:
+              - log-text: ''
+                operator: AND
+            escalate-status: false
+            run-if-job-successful: false
+            script: /usr/local/bin/rebuild-node.sh

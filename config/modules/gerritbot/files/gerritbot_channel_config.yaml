@@ -1,0 +1,702 @@
+openstack-infra:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack-dev/cookiecutter
+      - openstack-dev/hacking
+      - openstack-dev/pbr
+      - openstack-infra/askbot-theme
+      - openstack-infra/bugdaystats
+      - openstack-infra/config
+      - openstack-infra/devstack-gate
+      - openstack-infra/elastic-recheck
+      - openstack-infra/gear
+      - openstack-infra/gearman-plugin
+      - openstack-infra/gerrit
+      - openstack-infra/gerrit-trigger-plugin
+      - openstack-infra/gerritbot
+      - openstack-infra/gerritlib
+      - openstack-infra/gitdm
+      - openstack-infra/git-review
+      - openstack-infra/jeepyb
+      - openstack-infra/jenkins-job-builder
+      - openstack-infra/lodgeit
+      - openstack-infra/meetbot
+      - openstack-infra/nodepool
+      - openstack-infra/nose-html-output
+      - openstack-infra/odsreg
+      - openstack-infra/os-loganalyze
+      - openstack-infra/publications
+      - openstack-infra/puppet-apparmor
+      - openstack-infra/puppet-dashboard
+      - openstack-infra/puppet-vcsrepo
+      - openstack-infra/pypi-mirror
+      - openstack-infra/release-tools
+      - openstack-infra/releasestatus
+      - openstack-infra/reviewday
+      - openstack-infra/reviewstats
+      - openstack-infra/statusbot
+      - openstack-infra/storyboard
+      - openstack-infra/storyboard-webclient
+      - openstack-infra/zuul
+      - openstack-infra/zuul-packaging
+      - openstack/requirements
+    branches:
+      - master
+      - feature/gearman
+      - zuul
+      - template
+      - overview
+      - logstash
+      - gearman-plugin
+      - sysadmin-codereview
+      - debian/sid
+      - openstack/2.8
+
+openstack-doc:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/api-site
+      - openstack/compute-api
+      - openstack/database-api
+      - openstack/identity-api
+      - openstack/image-api
+      - openstack/netconn-api
+      - openstack/object-api
+      - openstack/openstack-doc-tools
+      - openstack/openstack-manuals
+      - openstack/operations-guide
+      - openstack/volume-api
+      - stackforge/clouddocs-maven-plugin
+    branches:
+      - master
+      - stable/havana
+
+openstack-ceilometer:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/ceilometer
+      - openstack/python-ceilometerclient
+      - openstack/pycadf
+    branches:
+      - master
+
+openstack-dns:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/designate
+      - stackforge/python-designateclient
+    branches:
+      - master
+      - stable/havana
+
+openstack-trove:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/trove
+      - openstack/trove-integration
+      - openstack/python-troveclient
+      - openstack/database-api
+    branches:
+      - master
+
+tripleo:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack-infra/tripleo-ci
+      - openstack/diskimage-builder
+      - openstack/os-apply-config
+      - openstack/os-cloud-config
+      - openstack/os-collect-config
+      - openstack/os-refresh-config
+      - openstack/python-tuskarclient
+      - openstack/tripleo-heat-templates
+      - openstack/tripleo-image-elements
+      - openstack/tripleo-incubator
+      - openstack/tuskar
+      - openstack/tuskar-ui
+    branches:
+      - master
+
+heat:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/heat
+      - openstack/python-heatclient
+      - openstack/heat-cfntools
+      - openstack/heat-templates
+      - openstack-dev/heat-cfnclient
+    branches:
+      - master
+
+openstack-neutron:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/neutron
+      - openstack/python-neutronclient
+    branches:
+      - master
+
+openstack-sahara:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/sahara
+      - openstack/python-saharaclient
+      - openstack/sahara-dashboard
+      - openstack/sahara-extra
+      - openstack/sahara-image-elements
+      - stackforge/puppet-sahara
+      - stackforge/sahara-ci-config
+      - stackforge/sahara-guestagent
+    branches:
+      - master
+      - stable/0.1
+      - stable/0.2
+      - stable/0.3
+
+openstack-nova:
+    events:
+      - patchset-created
+      - x-vrif-minus-2
+    projects:
+      - openstack/gantt
+      - openstack/nova
+      - openstack/nova-specs
+      - openstack/python-ganttclient
+      - openstack/python-novaclient
+    branches:
+      - master
+
+openstack-cinder:
+    events:
+      - patchset-created
+      - x-vrif-minus-2
+    projects:
+      - openstack/cinder
+      - openstack/python-cinderclient
+    branches:
+      - master
+
+openstack-qa:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/qa-specs
+      - openstack/tempest
+      - openstack-dev/devstack
+      - openstack-dev/grenade
+      - openstack-infra/elastic-recheck
+      - openstack-infra/devstack-gate
+    branches:
+      - master
+
+puppet-openstack:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/puppet-ceilometer
+      - stackforge/puppet-ceph
+      - stackforge/puppet-cinder
+      - stackforge/puppet-designate
+      - stackforge/puppet-glance
+      - stackforge/puppet-heat
+      - stackforge/puppet-horizon
+      - stackforge/puppet-ironic
+      - stackforge/puppet-keystone
+      - stackforge/puppet-neutron
+      - stackforge/puppet-nova
+      - stackforge/puppet-openstack
+      - stackforge/puppet_openstack_builder
+      - stackforge/puppet-openstack_dev_env
+      - stackforge/puppet-swift
+      - stackforge/puppet-tempest
+      - stackforge/puppet-vswitch
+    branches:
+      - master
+      - stable/grizzly
+      - stable/havana
+
+openstack-chef:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/cookbook-openstack-block-storage
+      - stackforge/cookbook-openstack-common
+      - stackforge/cookbook-openstack-compute
+      - stackforge/cookbook-openstack-dashboard
+      - stackforge/cookbook-openstack-identity
+      - stackforge/cookbook-openstack-image
+      - stackforge/cookbook-openstack-integration-test
+      - stackforge/cookbook-openstack-network
+      - stackforge/cookbook-openstack-object-storage
+      - stackforge/cookbook-openstack-ops-database
+      - stackforge/cookbook-openstack-ops-messaging
+      - stackforge/cookbook-openstack-orchestration
+      - stackforge/cookbook-openstack-telemetry
+      - stackforge/openstack-chef-repo
+    branches:
+      - master
+      - stable/grizzly
+
+openstack-mistral:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/mistral
+      - stackforge/mistral-extra
+      - stackforge/python-mistralclient
+    branches:
+      - master
+
+murano:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/murano-agent
+      - stackforge/murano-api
+      - stackforge/murano-conductor
+      - stackforge/murano-dashboard
+      - stackforge/murano-deployment
+      - stackforge/murano-docs
+      - stackforge/murano-tests
+      - stackforge/python-muranoclient
+      - stackforge/murano-common
+      - stackforge/murano-repository
+      - stackforge/murano-metadataclient
+    branches:
+      - master
+
+magnetodb:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/magnetodb
+    branches:
+      - master
+
+billingstack:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/billingstack
+    branches:
+      - master
+
+openstack-ironic:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/ironic
+      - openstack/python-ironicclient
+      - stackforge/pyghmi
+    branches:
+      - master
+
+openstack-swift:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/swift
+      - openstack/swift-bench
+      - openstack/python-swiftclient
+    branches:
+      - master
+      - feature/ec
+
+openstack-state-management:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/taskflow
+    branches:
+      - master
+
+openstack-barbican:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/barbican
+      - stackforge/python-barbicanclient
+    branches:
+      - master
+
+fuel-dev:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/fuel-web
+      - stackforge/fuel-astute
+      - stackforge/fuel-ostf
+      - stackforge/fuel-main
+      - stackforge/fuel-provision
+      - stackforge/fuel-docs
+      - stackforge/fuel-library
+      - stackforge/fuel-devops
+    branches:
+      - master
+
+openstack-glance:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/glance
+      - openstack/python-glanceclient
+    branches:
+      - master
+
+openstack-marconi:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack/marconi
+      - openstack/python-marconiclient
+    branches:
+      - master
+
+stackforge-libra:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/libra
+      - stackforge/python-libraclient
+    branches:
+      - master
+
+openstack-rally:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/rally
+      - stackforge/python-rallyclient
+    branches:
+      - master
+
+openstack-climate:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/climate
+      - stackforge/climate-nova
+      - stackforge/python-climateclient
+    branches:
+      - master
+
+refstack:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/refstack
+    branches:
+      - master
+
+rubick:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/rubick
+    branches:
+      - master
+
+solum:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/solum
+      - stackforge/python-solumclient
+    branches:
+      - master
+
+storyboard:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - openstack-infra/storyboard
+      - openstack-infra/storyboard-webclient
+    branches:
+      - master
+
+milk-dev:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/milk
+    branches:
+      - master
+
+openstack-entropy:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/entropy
+    branches:
+      - master
+
+packstack-dev:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/packstack
+    branches:
+      - master
+      - grizzly
+      - havana
+
+openstack-anvil:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/anvil
+    branches:
+      - master
+      - stable/grizzly
+
+syscompass:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/compass-adapters
+      - stackforge/compass-core
+      - stackforge/compass-web
+    branches:
+      - master
+
+openstack-keystone:
+    events:
+      - change-merged
+      - patchset-created
+      - x-vrif-minus-2
+    projects:
+      - openstack/keystone
+      - openstack/identity-api
+      - openstack/python-keystoneclient
+    branches:
+      - master
+
+openstack-manila:
+    events:
+      - patchset-created
+      - change-merged
+      - x-vrif-minus-2
+    projects:
+      - stackforge/manila
+      - stackforge/python-manilaclient
+    branches:
+      - master
+
+openstack-merges:
+    events:
+      - change-merged
+    branches:
+      - master
+    projects:
+      # grep openstack governance/reference/programs.yaml | grep -v url
+      - openstack/nova
+      - openstack/python-novaclient
+      - openstack/gantt
+      - openstack/python-ganttclient
+      - openstack/swift
+      - openstack/python-swiftclient
+      - openstack/swift-bench
+      - openstack/glance
+      - openstack/python-glanceclient
+      - openstack/keystone
+      - openstack/python-keystoneclient
+      - openstack/horizon
+      - openstack/django_openstack_auth
+      - openstack/tuskar-ui
+      - openstack/neutron
+      - openstack/python-neutronclient
+      - openstack/cinder
+      - openstack/python-cinderclient
+      - openstack/ceilometer
+      - openstack/python-ceilometerclient
+      - openstack/heat
+      - openstack/python-heatclient
+      - openstack/heat-cfntools
+      - openstack/heat-templates
+      - openstack-dev/heat-cfnclient
+      - openstack/trove
+      - openstack/python-troveclient
+      - openstack/trove-integration
+      - openstack/ironic
+      - openstack/python-ironicclient
+      - openstack/oslo-incubator
+      - openstack/oslo.config
+      - openstack/oslo.messaging
+      - openstack/oslo.rootwrap
+      - openstack/oslo.sphinx
+      - openstack/oslo.version
+      - openstack-dev/cookiecutter
+      - openstack-dev/hacking
+      - openstack-dev/pbr
+      - openstack-dev/openstack-nose
+      - openstack-infra/activity-board
+      - openstack-infra/askbot-theme
+      - openstack-infra/config
+      - openstack-infra/devstack-gate
+      - openstack-infra/elastic-recheck
+      - openstack-infra/gear
+      - openstack-infra/gearman-plugin
+      - openstack-infra/gerrit
+      - openstack-infra/gerritbot
+      - openstack-infra/gerritlib
+      - openstack-infra/git-review
+      - openstack-infra/gitdm
+      - openstack-infra/groups
+      - openstack-infra/jeepyb
+      - openstack-infra/jenkins-job-builder
+      - openstack-infra/lodgeit
+      - openstack-infra/meetbot
+      - openstack-infra/nodepool
+      - openstack-infra/nose-html-output
+      - openstack-infra/odsreg
+      - openstack-infra/openstackid
+      - openstack-infra/os-loganalyze
+      - openstack-infra/publications
+      - openstack-infra/puppet-apparmor
+      - openstack-infra/puppet-dashboard
+      - openstack-infra/puppet-vcsrepo
+      - openstack-infra/pypi-mirror
+      - openstack-infra/releasestatus
+      - openstack-infra/reviewday
+      - openstack-infra/reviewstats
+      - openstack-infra/statusbot
+      - openstack-infra/storyboard
+      - openstack-infra/tripleo-ci
+      - openstack-infra/zmq-event-publisher
+      - openstack-infra/zuul
+      - openstack-infra/zuul-packaging
+      - openstack/openstack-planet
+      - openstack/api-site
+      - openstack/compute-api
+      - openstack/database-api
+      - openstack/identity-api
+      - openstack/image-api
+      - openstack/netconn-api
+      - openstack/object-api
+      - openstack/openstack-doc-tools
+      - openstack/openstack-manuals
+      - openstack/operations-guide
+      - openstack/volume-api
+      - openstack/tempest
+      - openstack-dev/grenade
+      - openstack/diskimage-builder
+      - openstack/os-apply-config
+      - openstack/os-collect-config
+      - openstack/os-refresh-config
+      - openstack/tripleo-heat-templates
+      - openstack/tripleo-image-elements
+      - openstack/tripleo-incubator
+      - openstack/tuskar
+      - openstack/python-tuskarclient
+      - openstack-dev/devstack
+      - openstack-infra/release-tools
+      - openstack/marconi
+      - openstack/python-marconiclient
+      - openstack/sahara
+      - openstack/python-saharaclient
+      - openstack/sahara-dashboard
+      - openstack/sahara-extra
+      - openstack/sahara-image-elements
+
+openstack-oslo:
+    events:
+      - patchset-created
+      - x-vrif-minus-2
+    projects:
+      - openstack/cliff
+      - openstack/oslo.config
+      - openstack/oslo-incubator
+      - openstack/oslo.messaging
+      - openstack/oslo.rootwrap
+      - openstack/oslosphinx
+      - openstack/oslo.test
+      - openstack/oslo.version
+      - openstack/oslo.vmware
+      - openstack/pycadf
+      - openstack/stevedore
+      - openstack/taskflow
+      - openstack-dev/cookiecutter
+      - openstack-dev/hacking
+      - openstack-dev/oslo-cookiecutter
+      - openstack-dev/pbr
+    branches:
+      - master

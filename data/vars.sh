@@ -1,0 +1,17 @@
+export UPSTREAM_GERRIT_HOST_PUBLIC_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtdLzDzG6qmejiZq5BxDqxkN71W08xuQWVZ+6784SpsXTUujKT49lNCXmH+IHijsRaigU9cVFkWErVez0Q+NtUe077c5s50zCrL7EwH5/aiwaYklHF566TO7ctOJBLLsoVOUlJGpUAjM4veG9XMz0KhTP9qYK3zqNOcPV++551bQu1rc3kR8R8C/etmP60zMhVkUAdgyPWFZbmKlrBv1SxIpvjSo5STZzSRS7DK5/D9BaWS3zOcl5Pqtv0FVjm83dmQJxMPEjFo8e0T4Gq/noxYafQse4811/Ucmxj8J5rlJchakfxJz827w3MWYR4Ku+X3QAy/deBuvzUn3z35Zwr"
+export GIT_EMAIL='ryu-openstack-review@lists.sourceforge.net'
+export GIT_NAME='Neutron Ryu'
+export UPSTREAM_GERRIT_SERVER=review.openstack.org
+export UPSTREAM_GERRIT_USER=neutronryu
+export UPSTREAM_GERRIT_SSH_KEY_PATH=gerrit_key
+export JENKINS_SSH_KEY_PATH=jenkins_key
+export PUBLISH_HOST=master
+export JENKINS_URL=http://master:8080/
+export ZUUL_URL=http://master/p
+export SCP_NAME=logserver
+export SCP_HOST=
+export SCP_PORT=
+export SCP_USER=
+export SCP_PASSWORD=
+export SCP_KEYFILE=/var/lib/jenkins/.ssh/id_rsa
+export SCP_DESTPATH=/var/www/ryuci

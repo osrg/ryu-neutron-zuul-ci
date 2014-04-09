@@ -1,0 +1,17 @@
+- project:
+    name: ryuplugin
+    github-org: local
+    node: master
+    vendor: neutronryu
+
+    jobs:
+        - check-tempest-dsvm-ryuplugin
+
+- project:
+    name: ofagent
+    github-org: local
+    node: master
+    vendor: neutronryu
+
+    jobs:
+        - check-tempest-dsvm-ofagent
