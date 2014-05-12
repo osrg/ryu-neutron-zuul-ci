@@ -15,7 +15,7 @@ pipelines:
           branch: ^master$
         - event: comment-added
           branch: ^master$
-          comment_filter: (?i)^\s*recheck-ryu\s*$
+          comment_filter: (?i)^(Patch Set [0-9]+:\n\n)?\s*recheck-ryu\s*$
 #        - event: comment-added
 #          branch: ^master$
 #          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
@@ -29,8 +29,8 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-    success-pattern: http://180.37.183.32/ryuci/logs/{build.parameters[LOG_PATH]}
-    failure-pattern: http://180.37.183.32/ryuci/logs/{build.parameters[LOG_PATH]}
+    success-pattern: http://180.37.183.32/ryuci/{build.parameters[LOG_PATH]}
+    failure-pattern: http://180.37.183.32/ryuci/{build.parameters[LOG_PATH]}
   - name: ^check-tempest-dsvm.*$
     parameter-function: single_use_node
 

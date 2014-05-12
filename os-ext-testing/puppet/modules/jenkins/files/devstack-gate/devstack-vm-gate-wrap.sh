@@ -314,7 +314,7 @@ if function_exists "pre_test_hook"; then
   echo "Running pre_test_hook"
   xtrace=$(set +o | grep xtrace)
   set -o xtrace
-  tsfilter pre_test_hook | tee $WORKSPACE/devstack-gate-pre-test-hook.txt
+  tsfilter pre_test_hook > $WORKSPACE/devstack-gate-pre-test-hook.txt
   sudo mv $WORKSPACE/devstack-gate-pre-test-hook.txt $BASE/logs/
   $xtrace
 fi

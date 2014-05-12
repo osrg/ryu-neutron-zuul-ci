@@ -14,4 +14,4 @@ export SCP_PORT=
 export SCP_USER=
 export SCP_PASSWORD=
 export SCP_KEYFILE=/var/lib/jenkins/.ssh/id_rsa
-export SCP_DESTPATH=/var/www/ryuci
+export SCP_DESTPATH=/data/ryuci
