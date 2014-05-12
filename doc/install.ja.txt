@@ -1,0 +1,931 @@
+============================================
+Neutron Ryu Third-party Testing 環境構築手順
+============================================
+
+概要
+====
+
+OpenStack Infra[1]が使用/開発している各種ソフトウェアを使った、Ryu Project
+のThird-party Testing環境を構築します。
+
+大きく分けるとテストを実行するテストサーバとテスト結果のログを公開するため
+のログサーバで構成されます。テストサーバでは、openstack.orgのGerritを監視
+してテストを実行するジョブの管理、テスト結果の報告などを行うマスターノード
+と、実際の個々のテストを実行するスレーブノードのVMを実行します。
+
+
+        review.openstack.org
+                 |
+     +-----------|------ test server ----------------+
+     |           |                                   |
+     |  +-- master node --+    +-- slave node --+    |
+     |  |      Zuul       |    |    devstack    |+   |
+     |  |     Gearman     |----|     tempest    ||+  |
+     |  |     Jenkins     |    |                |||  |
+     |  +-----------------+    +----------------+||  |
+     |           |              +----------------+|  |
+     |           |               +----------------+  |
+     |           |                                   |
+     +-----------|-----------------------------------+
+                 |
+        +-- log server ---+
+        |                 | 
+        |      Apache     | 
+        |                 | 
+        +-----------------+
+
+中核となるのはマスターノードで実行されるZuul[2]です。Zuulには、Gerritスト
+リームイベントを監視し、テスト実行のスケジューリングを行い、Gearmanを経由
+してJenkinsにテストの実行を指示、テスト結果をGerritに報告するというような
+様々な機能があります。
+
+Jenkinsは、実行するテストの内容を管理し、Zuulからの指示でテストをスレーブ
+ノード上で実行、テスト結果のログをログサーバに転送します。
+
+スレーブノードでは、Jenkinsからリモート操作でテストが実行されます。主に
+devstackの起動とtempestのテストを実行します。テスト環境を状態をリセットす
+るためにテスト終了後にリブートを行います。リブート前に次のテストが割り当て
+られないように、テスト完了時にGearmanによって当該スレーブノードはオフライン
+にされます。スレーブノードは起動時に、JenkinsのCLIを使って自ノードをオン
+ラインにします。
+
+
+1: https://wiki.openstack.org/wiki/InfraTeam
+2: http://ci.openstack.org/zuul/
+
+
+構築手順
+========
+
+基本的に、テスト環境はJay Pipes氏の記事[3]とAkihiro Motoki氏の記事[4]を参考
+に構築しました。
+必要となるソフトウェアのインストールやセットアップを行うスクリプトは、
+Jay Pipes氏が公開しているものやOpenStack InfraのものをRyu Project用に
+変更しました。必要な作業は極力スクリプトの実行のみで行われるように
+自動化していますが、未対応の作業は手動で行う必要があります。
+
+3: http://www.joinfu.com/2014/02/setting-up-an-external-openstack-testing-system/
+4: http://ritchey98.blogspot.jp/2014/02/openstack-third-party-testing-how-to.html
+
+
+テストサーバ
+------------
+
+テストサーバで必要となるマシンスペックは以下の通りです。
+
+CPU: Quad core以上のプロセッサ
+メモリ: 16GB以上
+ディスク: 260GB以上
+
+実際には、稼働させるスレーブノードの数によります。
+ディスクについては、ホスト自身10GB、マスターノード10GB、スレーブノード
+40GBx台数となり、ここではスレーブノードを6つ用意することを想定し、
+10GB + 10GB + 40GB x 6 = 260GBとしています。
+
+マスターノードおよびスレーブノードに割り当てるCPU数、メモリ容量はそれぞれ
+1CPU、2GBとしています。スレーブノードに割り当てるメモリ容量は、実行する
+テストによります。ここではネットワークのAPIテストのみを実施することを前提
+にしています。実際には2GBでは、スワップが使用されますが、テスト時間には
+大きな影響が見られませんでした。
+
+
+テスト環境構成
+^^^^^^^^^^^^^^
+
+ここで構築する環境は以下の通りです。
+
+
+     <Gateway/DNS>
+           | .1
+    -------+----------+--------------++++++-------------- 192.168.122.0/24
+                      | .10          |||||| .21～26
+                 +----+----+    +----+-----+
+                 | master  |    |  slave1  |+ 
+                 |---------|    |----------||+
+                 |   Zuul  |    | devstack |||+
+                 | Jenkins |    |  tempest ||||+
+                 |     ... |    |      ... |||||+
+                 +---------+    +----------+|||||
+                                 +----------+||||
+                                  +----------+|||
+                                   +----------+||
+                                    +----------+|
+                                     +----------+
+
+ZuulおよびJenkinsが稼働するマスターノード(master)が1台、マスターノードの
+Jenkinsからリモート制御で実際にテストを実行するスレーブノード(slave1～6)が
+6台の合計7つのVMをテストサーバ上に作成します。
+仮想ネットワークはlibvirtの標準(default/NAT)をそのまま使用します。
+また、ホストのOS並びにVMのOSには、Ubuntu 12.04.4 LTS Server 64bit版を使用
+します。
+
+
+インストールスクリプトの準備
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+まず、インストールスクリプトをgithubから取得します。この作業はテストサーバ
+のホスト上で行うものとします。
+
+    $ git clone https://github.com/ykaneko/ryuci
+    $ ls ryuci
+    config  install_master.sh   install_puppet.sh  os-ext-testing
+    data    install_modules.sh  install_slave.sh
+
+変数の設定とSSH鍵の準備を行います。
+
+
+(1) 変数の設定
+
+ryuci/data/vars.shにインストールスクリプトが使用する各種変数が記述されて
+いるので、環境に合わせて値をセットします。
+
+    $ cat ryuci/data/vars.sh
+    export UPSTREAM_GERRIT_HOST_PUBLIC_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtdLzDzG6qmejiZq5BxDqxkN71W08xuQWVZ+6784SpsXTUujKT49lNCXmH+IHijsRaigU9cVFkWErVez0Q+NtUe077c5s50zCrL7EwH5/aiwaYklHF566TO7ctOJBLLsoVOUlJGpUAjM4veG9XMz0KhTP9qYK3zqNOcPV++551bQu1rc3kR8R8C/etmP60zMhVkUAdgyPWFZbmKlrBv1SxIpvjSo5STZzSRS7DK5/D9BaWS3zOcl5Pqtv0FVjm83dmQJxMPEjFo8e0T4Gq/noxYafQse4811/Ucmxj8J5rlJchakfxJz827w3MWYR4Ku+X3QAy/deBuvzUn3z35Zwr"
+    export GIT_EMAIL='ryu-openstack-review@lists.sourceforge.net'
+    export GIT_NAME='Neutron Ryu'
+    export UPSTREAM_GERRIT_USER=neutronryu
+    export UPSTREAM_GERRIT_SSH_KEY_PATH=gerrit_key
+    export JENKINS_SSH_KEY_PATH=jenkins_key
+    export PUBLISH_HOST=master
+    export JENKINS_URL=http://master:8080/
+    export ZUUL_URL=http://master/p
+    export SCP_NAME=cloudn
+    export SCP_HOST=180.37.183.32
+    export SCP_PORT=48822
+    export SCP_USER=jenkins
+    export SCP_PASSWORD=
+    export SCP_KEYFILE=/var/lib/jenkins/.ssh/id_rsa
+    export SCP_DESTPATH=/data/ryuci
+
+=============================== =============================================
+UPSTREAM_GERRIT_HOST_PUBLIC_KEY gerritのssh host keyをセットします。この値
+                                は、/home/zuul/.ssh/known_hostsの作成で使わ
+                                れます。
+------------------------------- ---------------------------------------------
+GIT_EMAIL                       gitアカウントのメールアドレスです。/etc/zuul/
+                                zuul.confのmerger.git_user_emailにセットされ
+                                ます。git config user.emailに対応します。
+------------------------------- ---------------------------------------------
+GIT_NAME                        gitアカウントのユーザ名です。/etc/zuul/zuul.
+                                confのmerger.git_user_nameにセットされます。
+                                git config user.nameに対応します。
+------------------------------- ---------------------------------------------
+UPSTREAM_GERRIT_USER            openstack-infraから取得したサービスアカウント
+                                のユーザ名です。/etc/zuul/zuul.confのgerrit.
+                                userにセットされます。
+------------------------------- ---------------------------------------------
+UPSTREAM_GERRIT_SSH_KEY         openstack-infraから取得したサービスアカウント
+                                のssh private keyのファイル名をセットします。
+                                このファイル名に'.pub'を付加したssh public key
+                                もセットで必要になります。
+------------------------------- ---------------------------------------------
+JENKINS_SSH_KEY_PATH            スレーブノードとの通信で使用するssh private
+                                keyのファイル名をセットします。このファイル名
+                                に'.pub'を付加したssh public keyも必要です。
+------------------------------- ---------------------------------------------
+PUBLISH_HOST                    公開URLのホスト名をセットします。ジョブ開始
+                                時のGerritへのコメントに記載されるstatusページ
+                                のURLなどで使われます。/etc/zuul/zuul.confの
+                                zuul.status_urlのホスト部にセットされます。
+                                Ryu CI infraでは使いません。
+------------------------------- ---------------------------------------------
+JENKINS_URL                     JenkinsのURLをセットします。スレーブノードが
+                                リブート時にJenkins CLIを使って自ノードを
+                                onlineにする時に使用します。スレーブノードの
+                                /etc/default/jenkins-slaveのJENKINS_URLにセッ
+                                トされます。
+------------------------------- ---------------------------------------------
+ZUUL_URL                        zuul-mergerのgitリポジトリのURLをセットします。
+                                Jenkinsのジョブ実行時に与えられるパラメータの
+                                ZUUL_URLにセットされます。/etc/zuul/zuul.conf
+                                のmerger.zuul_urlにセットされます。
+------------------------------- ---------------------------------------------
+SCP_NAME                        ログサーバへテストログをSCPで転送する設定の
+                                設定名をセットします。JenkinsのSCPプラグイン
+                                の設定値として使われます。
+------------------------------- ---------------------------------------------
+SCP_HOST                        テストログの転送先ログサーバ名をセットします。
+                                JenkinsのSCPプラグインの設定値として使われま
+                                す。
+------------------------------- ---------------------------------------------
+SCP_PORT                        転送先ログサーバのポート番号をセットします。
+                                JenkinsのSCPプラグインの設定値として使われま
+                                す。
+------------------------------- ---------------------------------------------
+SCP_USER                        ログサーバへテストログをSCPで転送する際に使わ
+                                れるsshアカウント名をセットします。Jenkinsの
+                                SCPプラグインの設定値として使われます。
+------------------------------- ---------------------------------------------
+SCP_PASSWORD                    ログサーバへテストログをSCPで転送する際に使わ
+                                れるsshアカウントのパスワードをセットします。
+                                sshキーを使用する場合は、パスワードは使用しま
+                                せん。JenkinsのSCPプラグインの設定値として使
+                                われます。
+------------------------------- ---------------------------------------------
+SCP_KEYFILE                     ログサーバへテストログをSCPで転送する際に使わ
+                                れるsshキーファイルのパスをセットします。
+                                JenkinsのSCPプラグインの設定値として使われま
+                                す。
+------------------------------- ---------------------------------------------
+SCP_DESTPATH                    ログサーバへテストログをSCPで転送する際の転送
+                                先ディレクトリをセットします。JenkinsのSCPプラ
+                                グインの設定値として使われます。
+=============================== =============================================
+
+
+(2) sshキーの準備
+
+1で設定値を変更していなければ、必要となるsshキーはgerrit_key、gerrit_key.pub、
+jenkins_key、jenkins_key.pubになります。gerrit_key、gerrit_key.pubは、サービス
+アカウントを取得した際に使用したものをコピーしてください。
+
+    $ cp ~/id_rsa ryuci/data/gerrit_key
+    $ cp ~/id_rsa.pub ryuci/data/gerrit_key.pub
+
+jenkins_key、jenkins_key.pubは、以下のコマンドで新しいsshキーを作ることが
+できます。
+
+    $ cd ryuci/data
+    $ ssh-keygen -t rsa -b 1024 -N '' -f jenkins_key
+
+
+マスターノードVM
+^^^^^^^^^^^^^^^^
+
+virt-managerを使い、以下の設定内容のVMを作成します。
+Ubuntu 12.04.4 LTS Server 64bitのisoイメージ[5]が必要です。
+
+====================== =====================================
+Name                   master
+---------------------- -------------------------------------
+OS Type                Linux
+---------------------- -------------------------------------
+Version                Ubuntu 12.04 LTS (Precise Pangolin)
+---------------------- -------------------------------------
+Memory (RAM)           2048MB
+---------------------- -------------------------------------
+CPUs                   1
+---------------------- -------------------------------------
+Create a disk image    10GB
+on the computer's 
+hard driver
+---------------------- -------------------------------------
+Advanced options       Virutal network 'default': NAT
+---------------------- -------------------------------------
+Virt Type              kvm
+---------------------- -------------------------------------
+Architecture           x86_64
+====================== =====================================
+
+5: http://ftp.riken.jp/Linux/ubuntu-iso/CDs-Ubuntu/12.04.4/ubuntu-12.04.4-server-amd64.iso
+
+OSインストール後、ネットワークの設定をDHCPからstatic指定に変更します。
+
+    ubuntu@master:~$ sudo vi /etc/network/interfaces
+    auto eth0
+    iface eth0 inet static
+            address 192.168.122.10
+            netmask 255.255.255.0
+            gateway 192.168.122.1
+            dns-nameservers 192.168.122.1
+
+/etc/hostsに以下の内容を追加します。
+
+    ubuntu@master:~$ cat <<EOF >> /etc/hosts
+
+    192.168.122.10 master
+    192.168.122.21 slave1
+    192.168.122.22 slave2
+    192.168.122.23 slave3
+    192.168.122.24 slave4
+    192.168.122.25 slave5
+    192.168.122.26 slave6
+    EOF
+
+リブートするかネットワークインターフェイスを上げ直して設定内容を反映させ
+ます。
+
+    ubuntu@master:~$ sudo ifdown eth0
+    ubuntu@master:~$ sudo ifup eth0
+
+ホストからインストールスクリプトをコピーします。
+
+    $ scp -r ryuci ubuntu@192.168.122.10:
+
+マスターノード用のインストールスクリプトを実行します。
+
+    ubuntu@master:~$ cd ryuci
+    ubuntu@master:~/ryuci$ ./install_master.sh
+
+ユーザjenkinsのホームディレクトリを設定します。
+
+    ubuntu@master:~$ sudo service jenkins stop
+    ubuntu@master:~$ sudo usermod -d /var/lib/jenkins -s /bin/bash jenkins
+    ubuntu@master:~$ sudo service jenkins start
+
+インストール結果を確認します。
+
+* Gerritへのssh接続
+
+    ubuntu@master:~$ sudo -u zuul -i
+    zuul@master:~$ ssh -i /var/lib/zuul/ssh/id_rsa neutronryu@review.openstack.org -p 29418        
+
+      ****    Welcome to Gerrit Code Review    ****
+
+      Hi Neutron Ryu, you have successfully connected over SSH.
+
+      Unfortunately, interactive shells are disabled.
+      To clone a hosted Git repository, use:
+
+      git clone ssh://neutronryu@review.openstack.org:29418/REPOSITORY_NAME.git
+
+    Connection to review.openstack.org closed.
+
+
+* Zuulの設定内容
+
+    ubuntu@master:~$ sudo cat /etc/zuul/zuul.conf
+    [gearman]
+    server=127.0.0.1
+
+    [gearman_server]
+    start=true
+    log_config=/etc/zuul/gearman-logging.conf
+
+    [gerrit]
+    server=review.openstack.org
+    user=neutronryu
+    sshkey=/var/lib/zuul/ssh/id_rsa
+
+    [zuul]
+    layout_config=/etc/zuul/layout.yaml
+    log_config=/etc/zuul/logging.conf
+    pidfile=/var/run/zuul/zuul.pid
+    state_dir=/var/lib/zuul
+    report_times=ture
+    status_url=http://127.0.0.1/zuul/status
+    url_pattern=
+    job_name_in_report=true
+
+    [merger]
+    git_dir=/var/lib/zuul/git
+    git_user_name=Neutron Ryu
+    git_user_email=ryu-openstack-review@lists.sourceforge.net
+    zuul_url=http://master/p
+    log_config=/etc/zuul/merger-logging.conf
+    pidfile=/var/run/zuul-merger/zuul-merger.pid
+
+    ubuntu@master:~$ sudo cat /etc/zuul/layout.yaml
+    includes:
+      - python-file: openstack_functions.py
+
+    pipelines:
+      - name: check
+        description: Newly uploaded patchsets enter this pipeline to receive an initial +/-1 Verified vote from Jenkins.
+        failure-message: Build failed. Leave a comment with 'recheck-ryu' to rerun a check. ('recheck' will be ignored.)
+        manager: IndependentPipelineManager
+        precedence: low
+        trigger:
+          gerrit:
+            - event: patchset-created
+              branch: ^master$
+            - event: change-restored
+              branch: ^master$
+            - event: comment-added
+              branch: ^master$
+              comment_filter: (?i)^(Patch Set [0-9]+:\n\n)?\s*recheck-ryu\s*$
+    #        - event: comment-added
+    #          branch: ^master$
+    #          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+    #    success:
+    #      gerrit:
+    #        verified: 1
+    #    failure:
+    #      gerrit:
+    #        verified: 0
+
+    jobs:
+      - name: ^.*$
+        parameter-function: set_log_url
+        success-pattern: http://180.37.183.32/ryuci/{build.parameters[LOG_PATH]}
+        failure-pattern: http://180.37.183.32/ryuci/{build.parameters[LOG_PATH]}
+      - name: ^check-tempest-dsvm.*$
+        parameter-function: single_use_node
+
+    projects:
+      - name: openstack/neutron
+        check:
+          - check-tempest-dsvm-ryuplugin
+          - check-tempest-dsvm-ofagent
+
+
+* Jenkinsの設定内容
+
+ブラウザでマスターノードのポート8080番に接続してJenkinsのGUIを表示します。
+- 画面右下に表示されるJenkinsのバージョンが1.533であること [Fig1]
+- ジョブcheck-tempest-dsvm-ofagentとcheck-tempest-dsvm-ryupluginが登録されて
+  いることを確認します [Fig1]
+- Manage Jenkins(Jenkinsの管理) > Manage Plugins(プラグインの管理) > Installed
+  (インストール済み)から「Jenkins SCP publisher plugin」が導入されていること
+  を確認します [Fig2]
+- ジョブcheck-tempest-dsvm-ofagentの設定内容を確認します [Fig3]
+- ジョブcheck-tempest-dsvm-ryupluginの設定内容を確認します [Fig4]
+- Manage Jenkins(Jenkinsの管理) > Configure System(システムの設定)からSCP
+  repository hostsの設定内容を確認します [Fig5]
+- Manage Jenkins(Jenkinsの管理) > Manage Credentials から認証情報を確認します
+  [Fig6]
+
+*注意*
+    Jenkinsのバージョンアップは行わないでください。
+
+    debパッケージについてはaptの設定でversion 1.533にピンで固定しているため、
+    apt-get upgradeなどではバージョンアップされないようになっているはずですが、
+    手動でのバージョンアップ(warファイルを置き換える等)は禁止できません。
+
+    Jenkins 1.551以降では、Jenkinsの仕様変更により、Gearman pluginが正常に
+    動作しない場合があります。
+
+
+*注意*
+    Jenkinsのセキュリティ設定は行わないでください。
+
+    現状のスクリプトでは、スレーブノードからの接続ができなくなり、onlineに
+    することができなくなります。
+
+
+スレーブノードVM
+^^^^^^^^^^^^^^^^
+
+virt-managerを使い、以下の設定内容のVMを作成します。
+
+====================== =====================================
+Name                   slave1
+---------------------- -------------------------------------
+OS Type                Linux
+---------------------- -------------------------------------
+Version                Ubuntu 12.04 LTS (Precise Pangolin)
+---------------------- -------------------------------------
+Memory (RAM)           2048MB
+---------------------- -------------------------------------
+CPUs                   1
+---------------------- -------------------------------------
+Create a disk image    40GB
+on the computer's 
+hard driver
+---------------------- -------------------------------------
+Advanced options       Virutal network 'default': NAT
+---------------------- -------------------------------------
+Virt Type              kvm
+---------------------- -------------------------------------
+Architecture           x86_64
+====================== =====================================
+
+OSインストール後、ネットワークの設定をDHCPからstatic指定に変更します。
+
+    ubuntu@slave1:~$ sudo vi /etc/network/interfaces
+    auto eth0
+    iface eth0 inet static
+            address 192.168.122.21
+            netmask 255.255.255.0
+            gateway 192.168.122.1
+            dns-nameservers 192.168.122.1
+
+/etc/hostsに以下の内容を追加します。
+
+    ubuntu@slave1:~$ cat <<EOF >> /etc/hosts
+    192.168.122.10 master
+    192.168.122.21 slave1
+    192.168.122.22 slave2
+    192.168.122.23 slave3
+    192.168.122.24 slave4
+    192.168.122.25 slave5
+    192.168.122.26 slave6
+    EOF
+
+リブートするかネットワークインターフェイスを上げ直して設定内容を反映させ
+ます。
+
+    ubuntu@slave1:~$ sudo ifdown eth0
+    ubuntu@slave1:~$ sudo ifup eth0
+
+ホストからインストールスクリプトをコピーします。
+
+    $ scp -r ryuci ubuntu@192.168.122.21:
+
+スレーブノード用のインストールスクリプトを実行します。
+
+    ubuntu@slave1:~$ cd ryuci
+    ubuntu@slave1:~/ryuci$ ./install_slave.sh
+
+インストール結果を確認します。
+
+    ubuntu@slave1:~$ sudo ovs-appctl version
+    ovs-vswitchd (Open vSwitch) 2.1.0
+    Compiled Mar 25 2014 19:31:05
+    ubuntu@slave1:~$ sudo ls -l /home/jenkins/
+    total 12
+    drwxr-xr-x 4 jenkins jenkins 4096 Mar 26 15:49 cache
+    drwxr-xr-x 2 jenkins jenkins 4096 Mar 26 15:28 devstack-gate
+    drwxr-xr-x 2 jenkins jenkins 4096 Mar 26 15:28 ovs2.1.0
+    ubuntu@slave1:~$ ls -l /usr/local/bin/rebuild-node.sh 
+    -rwxr-xr-x 1 root root 38 Mar 26 15:23 /usr/local/bin/rebuild-node.sh
+    ubuntu@slave1:~$ sudo service jenkins-slave help  
+    jenkins-slave [start|stop|connect|disconnect|online|offline]
+    ubuntu@slave1:~$ ls -l /opt/
+    total 12
+    drwxr-xr-x 7 root root 4096 Mar 26 15:49 git
+    drwxr-xr-x 2 root root 4096 Mar 26 15:28 nodepool-scripts
+    drwxr-xr-x 4 root root 4096 Mar 26 15:23 requirements
+    ubuntu@slave1:~$ ls -l /opt/git/
+    total 20
+    drwxr-xr-x  83 root root 4096 Mar 26 15:42 openstack
+    drwxr-xr-x  12 root root 4096 Mar 26 15:29 openstack-dev
+    drwxr-xr-x  42 root root 4096 Mar 26 15:31 openstack-infra
+    drwxr-xr-x   3 root root 4096 Mar 26 15:49 osrg
+    drwxr-xr-x 129 root root 4096 Mar 26 15:49 stackforge
+
+同様に残り5台のスレーブノードのVMも構築します。IPアドレスのみ各々で異なり
+ます。
+
+======== ==============
+ホスト名 IPアドレス
+-------- --------------
+slave1   192.168.122.21
+-------- --------------
+slave2   192.168.122.22
+-------- --------------
+slave3   192.168.122.23
+-------- --------------
+slave4   192.168.122.24
+-------- --------------
+slave5   192.168.122.25
+-------- --------------
+slave6   192.168.122.26
+======== ==============
+
+
+Jenkinsへのスレーブノードの登録
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ブラウザでマスターノードのポート8080番に接続してJenkinsのGUIを表示します。
+
+- Manage Jenkins(Jenkinsの管理) > Manage Nodes(ノードの管理) からノード管理
+  画面を表示します [Fig8-1]
+- New Node(新規ノード作成)をクリックしてノード登録画面を表示し、Node name
+  (ノード名)に「slave1」、「Dumb Slave(ダムスレーブ)」を選択してOKボタンを
+  クリックします [Fig8-2]
+- 以下の内容で設定し、Saveボタンをクリックします [Fig8-3]
+
+    ================================ ========================================
+    Name(ノード名)                   slave1
+    -------------------------------- ----------------------------------------
+    # of executores(同時ビルド数)    1
+    -------------------------------- ----------------------------------------
+    Remote FS root(リモートFSルート) /home/jenkins/workspaces
+    -------------------------------- ----------------------------------------
+    Labels(ラベル)                   devstack_slave
+    -------------------------------- ----------------------------------------
+    Usage(用途)                      Utilize this slave as much as possible
+                                     (このスレーブをできるだけ利用する)
+    -------------------------------- ----------------------------------------
+    Launch method(起動方法)          Launch slave agents on Unix machines via
+                                     SSH
+                                     (SSH経由でUnixマシンのスレーブエージェン
+                                     トを起動)
+    -------------------------------- ----------------------------------------
+    Host(ホスト)                     192.168.122.21
+    -------------------------------- ----------------------------------------
+    Credentials(認証情報)            jenkins
+    -------------------------------- ----------------------------------------
+    Availability(可用性)             Keep this slave on-line as much as
+                                     possible
+                                     (可能な限りオンラインのままにする)
+    ================================ ========================================
+
+- 同様にslave2～6を登録します。ノード登録画面で「Copy Existing Node(ノードを
+  コピー)」を選択すると登録済みノードの設定内容を初期値として引き継いで登録
+  を行うことができます。この場合、ノード名とIPアドレスのみ設定を変更するだけ
+  で済みます。
+
+登録が済むとノード一覧に登録したスレーブノードが表示されますが、この時点では
+offline状態になっています。[Fig8-4]
+各スレーブノードをリブートするか、次の操作を行うことでオンラインにします。
+
+    ubuntu@slave1:~$ sudo service jenkins-slave start
+
+すべてのスレーブノードがオンラインになったことを確認します。[Fig8-5]
+
+
+ログサーバ
+----------
+
+ログサーバでは、テストサーバからログファイルの転送を受け付けるためのsshの
+設定とログファイルをWeb経由で公開するためのApacheの設定を行います。
+
+
+sshの設定
+^^^^^^^^^
+
+ユーザjenkinsでSCP接続されるので、ユーザを作成します。
+
+    $ sudo useradd -m -s /bin/bash jenkins
+
+ssh鍵でログインできるようにauthorized_keysを設定します。
+
+    $ sudo mkdir /home/jenkins/.ssh
+    $ sudo cp id_rsa.pub /home/jenkins/.ssh/authorized_keys
+    $ sudo chown -R jenkins.jenkins /home/jenkins/.ssh
+
+このid_rsa.pubは、テストサーバのryuci/data/jenkins_key.pubをコピーしたもの
+です。
+
+sshサーバは、パスワード認証を無効にしておきます。
+
+    $ sudo vi /etc/ssh/sshd_config
+    PasswordAuthentication no
+    $ sudo service ssh reload
+
+
+apacheの設定
+^^^^^^^^^^^^
+
+ログ公開用ディレクトリを作成します。
+
+    $ sudo mkdir /var/www/ryuci
+    $ sudo chown jenkins.jenkins /var/www/ryuci
+
+ログ公開用ディレクトリの設定を追加します。
+
+    $ sudo vi /etc/apache2/site-enabled/000-default
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+
+        DocumentRoot /var/www/
+        <Directory />
+                Options FollowSymLinks
+                AllowOverride None
+                Order Deny,Allow
+                Deny from all
+        </Directory>
+        <Directory /var/www/ryuci>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride Indexes
+                Order Allow,Deny
+                Allow from all
+                IndexOptions +Charset=UTF-8 +FancyIndexing +IgnoreCase +FoldersFirst +SuppressHTMLPreamble +XHTML +HTMLTable +SuppressRules +SuppressDescription +NameWidth=*
+                HeaderName /ryuci/theme/header.html
+                ReadmeName /ryuci/theme/readme.html
+                IndexIgnore /ryuci/theme
+        </Directory>
+
+        #ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+        #<Directory "/usr/lib/cgi-bin">
+        #       AllowOverride None
+        #       Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        #       Order allow,deny
+        #       Allow from all
+        #</Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        Alias /ryuci/icons/ "/usr/share/apache2/icons/"
+
+</VirtualHost>
+
+ログファイルの公開は、単純にmod_autoindexでディレクトリインデックスを
+表示させます。ログサーバへのアクセスは、前段のnginxによって
+http://180.37.183.32/ryuci を条件として振り分けられるため、ルートは/ryuci
+となる必要があります。
+autoindexでは、
+- ページのタイトルと先頭に表示中のディレクトリのパスが表示されますが、
+  ルートは"/"となり、変更できない
+- ファイル/ディレクトリの先頭に表示されるアイコンのデフォルトのパスが"/"
+  になっている
+- 親ディレクトリへのリンク「Parent Directory」が最終的に"/"へのリンクに
+  なる
+という問題があり、ここでは若干強引に対処しています。
+
+- ページの先頭に表示されるパス
+
+  オプション HeaderName で表示内容を変更します。
+  /var/www/ryuci/theme/header.htmlを以下の内容で作成します。
+
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>Neutron Ryu CI</title>
+    <style>
+    html {
+      min-height: 100%;
+      color: #404040;
+      font-weight: 400;
+      font-size: 1em;
+      font-family: sans-serif;
+    }
+    body {
+      padding: 20px;
+    }
+    a {
+      color: #404080;
+      text-decoration: none;
+    }
+    table {
+      width: 700px;
+      border-collapse: collapse;
+      font-size: .8em;
+    }
+    tr {
+      outline: 0;
+      border: 0;
+    }
+    tr:hover td {
+      background: #f6f6f6;
+    }
+    th {
+      text-align: left;
+      font-size: .8em;
+      padding-right: 20px;
+      border-bottom: 2px solid #c0c0c0;
+    }
+    th + th {
+      width: 65%;
+    }
+    th + th + th {
+    }
+    th + th + th + th {
+      width: 5%;
+    }
+    tr td:first-of-type {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    td {
+      padding: 5px 0;
+      outline: 0;
+      border-bottom: 1px solid #c0c0c0;
+      vertical-align: middle;
+      text-align: left;
+    }
+    </style>
+    </head>
+    <body>
+    <H3>Neutron Ryu CI Results</H3>
+
+  タイトルを変更するため、IndexOptionsに +SuppressHTMLPreamble を追加しま
+  すが、そうすると</html>なども出力されなくなるため、オプションReadmeName 
+  を設定し、以下の内容で/ryuci/theme/readme.htmlを作成します。
+
+    </body>
+    </html>
+
+- アイコンのパス
+
+  /etc/apache2/mod-enabled/autoindex.confの"/icons"をすべて"/ryuci/icons"
+  に置換します。
+
+- 最上位の親ディレクトリ
+
+  /ryuci/ではディレクトリインデックスが表示されないように、以下の内容で
+  /var/www/ryuci/index.htmlを作成します。
+
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>Neutron Ryu CI</title>
+    <style>
+    html {
+      min-height: 100%;
+      color: #404040;
+      font-weight: 400;
+      font-size: 1em;
+      font-family: sans-serif;
+    }
+    body {
+      padding: 20px;
+    }
+    a {
+      color: #404080;
+      text-decoration: none;
+    }
+    table {
+      width: 700px;
+      border-collapse: collapse;
+      font-size: .8em;
+    }
+    tr {
+      outline: 0;
+      border: 0;
+    }
+    tr:hover td {
+      background: #f6f6f6;
+    }
+    th {
+      text-align: left;
+      font-size: .8em;
+      padding-right: 20px;
+      border-bottom: 2px solid #c0c0c0;
+    }
+    th + th {
+      width: 65%;
+    }
+    th + th + th {
+    }
+    th + th + th + th {
+      width: 5%;
+    }
+    tr td:first-of-type {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    td {
+      padding: 5px 0;
+      outline: 0;
+      border-bottom: 1px solid #c0c0c0;
+      vertical-align: middle;
+      text-align: left;
+    }
+    </style>
+    </head>
+    <body>
+    <H3>Neutron Ryu CI Results</H3>
+    </body>
+    </html>
+
+不要な情報を提供しないように、Apacheの設定を変更します。
+
+    $ sudo vi /etc/apache2/conf.d/security
+    ServerTokens Prod
+    ServerSignature Off
+    TraceEnable Off
+
+Apacheを再起動します。
+
+    $ sudo service apache2 restart
+
+
+Zuulの起動
+----------
+
+Gearmanクライアントの有効化
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+JenkinsのGearmanクライアントを有効にして、Zuulと連動するようにします。
+
+Manage Jenkins(Jenkinsの管理) > Configure System(システムの設定)からGearman
+Plugin Configを表示し、Enable Gearmanをチェックし、Saveボタンをクリックしま
+す。 [Fig7]
+
+
+zuulとzuul-mergerの起動
+^^^^^^^^^^^^^^^^^^^^^^^
+
+zuulとzuul-mergerを起動します。
+
+    ubuntu@master:~$ sudo service zuul start
+    ubuntu@master:~$ sudo service zuul-merger start
+
+起動したことを確認します。
+
+    ubuntu@master:~$ sudo service zuul status
+     * zuul is running
+    ubuntu@master:~$ sudo service zuul-merger status
+     * zuul-merger is running
+
+zuulのデバッグログでGerritストリームイベントを処理していることが確認できます。
+
+    ubuntu@master:~$ sudo tail -f /var/log/zuul/debug.log
+    2014-04-02 18:10:22,858 DEBUG zuul.Scheduler: Processing trigger event
+     <TriggerEvent comment-added openstack/neutron master 84667,1>
+    2014-04-02 18:10:22,858 DEBUG zuul.IndependentPipelineManager: Startin
+    g queue processor: check
+    2014-04-02 18:10:22,858 DEBUG zuul.IndependentPipelineManager: Finishe
+    d queue processor: check (changed: False)
+    2014-04-02 18:10:22,858 DEBUG zuul.Scheduler: Run handler sleeping
+    2014-04-02 18:10:22,859 DEBUG zuul.Scheduler: Done adding trigger even
+    t: <TriggerEvent comment-added openstack/neutron master 84667,1>
+
+また、zuulの状態はステータスページで確認することもできます。
+ブラウザでマスターノード(192.168.122.10:80)にアクセスするとステータスページ
+が確認できます。
+
+実行中のテストの状態は、Jenkinsの画面で確認できます。
+
+この時点では、テスト結果のGerritへの報告(vote)は無効になっています。有効に
+するには、/etc/zuul/layout.yamlの以下の部分のコメントを外します。
+
+    #    success:
+    #      gerrit:
+    #        verified: 1
+    #    failure:
+    #      gerrit:
+    #        verified: 0
+
+verifiedの値がスコアになります。本来、failureの場合は-1を与えますが、現状
+では0のままで良いようです。
+
