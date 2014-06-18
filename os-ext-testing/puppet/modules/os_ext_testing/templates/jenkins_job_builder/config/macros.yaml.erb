@@ -50,3 +50,14 @@
               source: 'logs/**'
               keep-hierarchy: true
               copy-after-failure: true
+
+- publisher:
+    name: devstack-confs
+    publishers:
+      - scp:
+          site: '<%= scp_name %>'
+          files:
+            - target: '$LOG_PATH'
+              source: 'confs/**'
+              copy-after-failure: true
+

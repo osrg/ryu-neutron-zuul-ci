@@ -111,6 +111,8 @@ fi
 # Make a directory to store logs
 rm -rf $WORKSPACE/logs
 mkdir -p $WORKSPACE/logs
+rm -rf $WORKSPACE/confs
+mkdir -p $WORKSPACE/confs
 
 # Set to 1 to run the Tempest test suite
 export DEVSTACK_GATE_TEMPEST=${DEVSTACK_GATE_TEMPEST:-0}
@@ -301,6 +303,10 @@ fi
 if [ -d "$WORKSPACE/logs" -a ! -e "$BASE/logs" ]; then
     sudo mv $WORKSPACE/logs $BASE/
     ln -s $BASE/logs $WORKSPACE/
+fi
+if [ -d "$WORKSPACE/confs" -a ! -e "$BASE/confs" ]; then
+    sudo mv $WORKSPACE/confs $BASE/
+    ln -s $BASE/confs $WORKSPACE/
 fi
 
 pre_test_hook() {

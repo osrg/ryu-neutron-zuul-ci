@@ -409,6 +409,11 @@ function cleanup_host {
     sudo cp $BASE/new/devstacklog.txt $NEWLOGTARGET/
     sudo cp $BASE/new/devstack/localrc $NEWLOGTARGET/localrc.txt
 
+    sudo cp $BASE/new/devstack/localrc $BASE/confs/
+    if [ -e $BASE/new/devstack/local.conf ]; then
+      sudo cp $BASE/new/devstack/local.conf $BASE/confs/
+    fi
+
     # Copy tempest config file
     sudo cp $BASE/new/tempest/etc/tempest.conf $NEWLOGTARGET/tempest.conf.txt
 

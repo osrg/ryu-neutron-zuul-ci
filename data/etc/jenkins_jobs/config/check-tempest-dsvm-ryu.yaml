@@ -34,6 +34,7 @@
 
     publishers:
       - devstack-logs  # In macros.yaml from os-ext-testing
+      - devstack-confs  # In macros.yaml from os-ext-testing
       - console-log  # In macros.yaml from os-ext-testing
       - post-tasks:
           - matches:
@@ -79,6 +80,7 @@
 
     publishers:
       - devstack-logs  # In macros.yaml from os-ext-testing
+      - devstack-confs  # In macros.yaml from os-ext-testing
       - console-log  # In macros.yaml from os-ext-testing
       - post-tasks:
           - matches:
