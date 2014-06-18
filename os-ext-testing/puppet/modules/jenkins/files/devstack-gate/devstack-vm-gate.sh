@@ -259,9 +259,14 @@ EOF
 Q_PLUGIN=ml2
 ENABLE_TENANT_TUNNELS=True
 TENANT_TUNNEL_RANGES=1100:1199
-Q_ML2_PLUGIN_MECHANISM_DRIVERS=ofagent
+Q_ML2_PLUGIN_MECHANISM_DRIVERS=ofagent,l2population
 Q_AGENT=ofagent
 NETWORK_API_EXTENSIONS=service-type,ext-gw-mode,security-group,l3_agent_scheduler,lbaas_agent_scheduler,fwaas,binding,provider,agent,quotas,dhcp_agent_scheduler,multi-provider,external-net,router,allowed-address-pairs,vpnaas,extra_dhcp_opt,lbaas,extraroute
+EOF
+        cat <<EOF >>local.conf
+[[post-config|/\$Q_PLUGIN_CONF_FILE]]
+[agent]
+l2_population=True
 EOF
     fi
 }
