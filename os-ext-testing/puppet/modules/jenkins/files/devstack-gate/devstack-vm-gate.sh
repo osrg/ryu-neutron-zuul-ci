@@ -264,7 +264,7 @@ Q_AGENT=ofagent
 NETWORK_API_EXTENSIONS=service-type,ext-gw-mode,security-group,l3_agent_scheduler,lbaas_agent_scheduler,fwaas,binding,provider,agent,quotas,dhcp_agent_scheduler,multi-provider,external-net,router,allowed-address-pairs,vpnaas,extra_dhcp_opt,lbaas,extraroute
 EOF
         cat <<EOF >>local.conf
-[[post-config|/\$Q_PLUGIN_CONF_FILE]]
+[[post-config|/etc/neutron/plugins/ml2/ml2_conf.ini]]
 [agent]
 l2_population=True
 EOF
