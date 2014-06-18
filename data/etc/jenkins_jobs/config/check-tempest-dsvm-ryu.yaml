@@ -14,8 +14,9 @@
           #!/bin/bash
           rm -rf devstack-gate
           ln -s ~/devstack-gate
-          sudo rm -rf /opt/stack/new/screen-logs /opt/stack/new/devstacklog.txt* /opt/stack/new/devstack/localrc /opt/stack/new/tempest/etc/tempest.conf /opt/stack/new/tempest/.testrepository /opt/stack/new/tempest/tempest.log /opt/stack/new/tempest/nosetests*.xml
+          sudo rm -rf /opt/stack/new/screen-logs /opt/stack/new/devstacklog.txt* /opt/stack/new/devstack/localrc /opt/stack/new/devstack/local.conf /opt/stack/new/tempest/etc/tempest.conf /opt/stack/new/tempest/.testrepository /opt/stack/new/tempest/tempest.log /opt/stack/new/tempest/nosetests*.xml
           sudo rm -rf /opt/stack/logs
+          sudo rm -rf /opt/stack/confs
           sudo apt-get remove -y -qq python-crypto python-iso8601 python-netaddr python-cmd2
           sudo ovs-vsctl --if-exists del-br br-int
           sudo ovs-vsctl --if-exists del-br br-ex
