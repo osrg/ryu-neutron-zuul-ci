@@ -400,7 +400,8 @@ if [ "$DEVSTACK_GATE_TEMPEST" -eq "1" ]; then
     elif [[ "$DEVSTACK_GATE_OFAGENT" -eq "1" ]] ; then
         echo "Running tempest neutron tests"
         sudo -H -u tempest -i tox -eall -- --concurrency=$TEMPEST_CONCURRENCY \
-            tempest.api.network
+            tempest.api.network \
+            tempest.scenario.test_network_basic_ops
         res=$?
     else
         echo "Running tempest smoke tests"
