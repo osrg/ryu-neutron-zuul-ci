@@ -45,5 +45,27 @@ class os_ext_testing::devstack_slave (
       require => File ['/home/jenkins'],
       source  => 'puppet:///modules/os_ext_testing/ovs2.1.0',
     }
+
+    package { 'libnetfilter-conntrack3':
+      ensure => present
+    }
+
+    exec { 'dnsmasq':
+      command => 'dpkg -i dnsmasq-utils_2.68-1_amd64.deb dnsmasq-base_2.68-1_amd64.deb',
+      path    => ['/sbin', '/bin', '/usr/sbin', '/usr/bin'],
+      cwd     => '/home/jenkins/dnsmasq',
+      require => [ Package [ 'libnetfilter-conntrack3'],
+                   File ['/home/jenkins/dnsmasq'] ],
+    }
+
+    file { '/home/jenkins/dnsmasq':
+      ensure  => directory,
+      owner   => 'jenkins',
+      group   => 'jenkins',
+      mode    => '0755',
+      recurse => true,
+      require => File ['/home/jenkins'],
+      source  => 'puppet:///modules/os_ext_testing/dnsmasq',
+    }
   }
 }

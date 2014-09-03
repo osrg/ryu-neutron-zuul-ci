@@ -1,0 +1,40 @@
+Format: 1.8
+Date: Sun, 8 Dec 2013 15:57:32 +0000
+Source: dnsmasq
+Binary: dnsmasq dnsmasq-base dnsmasq-utils
+Architecture: source amd64 all
+Version: 2.68-1
+Distribution: unstable
+Urgency: low
+Maintainer: Simon Kelley <simon@thekelleys.org.uk>
+Changed-By: Simon Kelley <simon@thekelleys.org.uk>
+Description: 
+ dnsmasq    - Small caching DNS proxy and DHCP/TFTP server
+ dnsmasq-base - Small caching DNS proxy and DHCP/TFTP server
+ dnsmasq-utils - Utilities for manipulating DHCP leases
+Closes: 730553
+Changes: 
+ dnsmasq (2.68-1) unstable; urgency=low
+ .
+    * New upstream. (closes: #730553)
+Checksums-Sha1: 
+ 633e9ce5cc7b17b8d8a7e2054ff17997815536ff 904 dnsmasq_2.68-1.dsc
+ cc00f79eb69b4cbd419e9aca1296bdcceee1923b 606359 dnsmasq_2.68.orig.tar.gz
+ 216fbdcc2e87834cf8c7a94090c5e12ab7bb6164 20207 dnsmasq_2.68-1.diff.gz
+ 9dbe74c48a59c97f09603579ece417762abd6f3a 416844 dnsmasq-base_2.68-1_amd64.deb
+ 89138f2417c4d6149dc8bb21c337c61baa88c1bc 18828 dnsmasq-utils_2.68-1_amd64.deb
+ 6e611b89813930223ac00d0184ec57b3ea06a38f 15754 dnsmasq_2.68-1_all.deb
+Checksums-Sha256: 
+ 2cfbe8b114b47cd3d3b84ca85d9b056c4d9b664616a250d9a0cd45f0975e9334 904 dnsmasq_2.68-1.dsc
+ 33e7387d74c8aa36fc782424c7d8ef57929ee01e0884e54903f3783ddf69c3be 606359 dnsmasq_2.68.orig.tar.gz
+ 249822cac53c4bc9daf53c08f035c2023acdcb32bca2e0994e3a34a0b300ec6e 20207 dnsmasq_2.68-1.diff.gz
+ 388b2e70ece50a1154ff81ee385d19407c040a35a883d6490e55236a558acb47 416844 dnsmasq-base_2.68-1_amd64.deb
+ 95b4aa2393c96b7c1b89b4fe6387cd9c9b7f95f962c270c23aad5a52f0584723 18828 dnsmasq-utils_2.68-1_amd64.deb
+ ef7488e9bb90f9bc377255395b97257c815d0a1cc7c68c063a10e20dd245250a 15754 dnsmasq_2.68-1_all.deb
+Files: 
+ 4b1b411a715d65925833f43bb2fe8575 904 net optional dnsmasq_2.68-1.dsc
+ 4ce4e0ee00848837a6cc9f88308ca4fa 606359 net optional dnsmasq_2.68.orig.tar.gz
+ 75827d6c20398b4971979e64d448db2d 20207 net optional dnsmasq_2.68-1.diff.gz
+ db06c7c9e6104463d4fce7bc8e575cba 416844 net optional dnsmasq-base_2.68-1_amd64.deb
+ fcd646e492c755d13cec528678798e8b 18828 net optional dnsmasq-utils_2.68-1_amd64.deb
+ b76ace0985f02447d45d497505693d00 15754 net optional dnsmasq_2.68-1_all.deb

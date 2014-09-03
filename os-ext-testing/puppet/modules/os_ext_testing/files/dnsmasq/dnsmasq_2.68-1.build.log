@@ -1,0 +1,687 @@
+
+build dnsmasq package(from ubuntu 14.04)
+
+- install build tools
+
+ubuntu@vaslave2:~/vazuul/dnsmasq/build$ sudo apt-get update
+Hit http://jp.archive.ubuntu.com precise Release.gpg
+Get:1 http://jp.archive.ubuntu.com precise-updates Release.gpg [198 B]
+Get:2 http://jp.archive.ubuntu.com precise-backports Release.gpg [198 B]
+Hit http://apt.puppetlabs.com precise Release.gpg
+Hit http://jp.archive.ubuntu.com precise Release
+Get:3 http://jp.archive.ubuntu.com precise-updates Release [98.7 kB]
+Hit http://apt.puppetlabs.com precise Release
+Get:4 http://jp.archive.ubuntu.com precise-backports Release [50.8 kB]
+Get:5 http://security.ubuntu.com precise-security Release.gpg [198 B]
+Hit http://jp.archive.ubuntu.com precise/main Sources
+Hit http://jp.archive.ubuntu.com precise/restricted Sources
+Hit http://jp.archive.ubuntu.com precise/universe Sources
+Hit http://jp.archive.ubuntu.com precise/multiverse Sources
+Hit http://jp.archive.ubuntu.com precise/main amd64 Packages
+Hit http://jp.archive.ubuntu.com precise/restricted amd64 Packages
+Hit http://jp.archive.ubuntu.com precise/universe amd64 Packages
+Hit http://jp.archive.ubuntu.com precise/multiverse amd64 Packages
+Hit http://jp.archive.ubuntu.com precise/main i386 Packages
+Hit http://apt.puppetlabs.com precise/main Sources
+Hit http://jp.archive.ubuntu.com precise/restricted i386 Packages
+Hit http://jp.archive.ubuntu.com precise/universe i386 Packages
+Hit http://jp.archive.ubuntu.com precise/multiverse i386 Packages
+Hit http://jp.archive.ubuntu.com precise/main TranslationIndex
+Hit http://jp.archive.ubuntu.com precise/multiverse TranslationIndex
+Hit http://jp.archive.ubuntu.com precise/restricted TranslationIndex
+Hit http://jp.archive.ubuntu.com precise/universe TranslationIndex
+Get:6 http://jp.archive.ubuntu.com precise-updates/main Sources [477 kB]
+Hit http://apt.puppetlabs.com precise/main amd64 Packages
+Hit http://apt.puppetlabs.com precise/main i386 Packages
+Ign http://apt.puppetlabs.com precise/main TranslationIndex
+Get:7 http://security.ubuntu.com precise-security Release [50.7 kB]
+Get:8 http://jp.archive.ubuntu.com precise-updates/restricted Sources [8,056 B]
+Get:9 http://jp.archive.ubuntu.com precise-updates/universe Sources [110 kB]
+Get:10 http://jp.archive.ubuntu.com precise-updates/multiverse Sources [8,881 B]
+Get:11 http://jp.archive.ubuntu.com precise-updates/main amd64 Packages [825 kB]
+Get:12 http://security.ubuntu.com precise-security/main Sources [108 kB]
+Get:13 http://jp.archive.ubuntu.com precise-updates/restricted amd64 Packages [13.7 kB]
+Get:14 http://jp.archive.ubuntu.com precise-updates/universe amd64 Packages [247 kB]
+Ign http://apt.puppetlabs.com precise/main Translation-en_US
+Ign http://apt.puppetlabs.com precise/main Translation-en
+Get:15 http://jp.archive.ubuntu.com precise-updates/multiverse amd64 Packages [15.3 kB]
+Get:16 http://jp.archive.ubuntu.com precise-updates/main i386 Packages [856 kB]
+Get:17 http://security.ubuntu.com precise-security/restricted Sources [2,494 B]
+Get:18 http://security.ubuntu.com precise-security/universe Sources [32.7 kB]
+Get:19 http://security.ubuntu.com precise-security/multiverse Sources [1,786 B]
+Get:20 http://security.ubuntu.com precise-security/main amd64 Packages [416 kB]
+Get:21 http://jp.archive.ubuntu.com precise-updates/restricted i386 Packages [13.7 kB]
+Get:22 http://jp.archive.ubuntu.com precise-updates/universe i386 Packages [253 kB]
+Get:23 http://jp.archive.ubuntu.com precise-updates/multiverse i386 Packages [15.5 kB]
+Hit http://jp.archive.ubuntu.com precise-updates/main TranslationIndex
+Hit http://jp.archive.ubuntu.com precise-updates/multiverse TranslationIndex
+Hit http://jp.archive.ubuntu.com precise-updates/restricted TranslationIndex
+Hit http://jp.archive.ubuntu.com precise-updates/universe TranslationIndex
+Get:24 http://jp.archive.ubuntu.com precise-backports/main Sources [5,145 B]
+Get:25 http://jp.archive.ubuntu.com precise-backports/restricted Sources [14 B]
+Get:26 http://jp.archive.ubuntu.com precise-backports/universe Sources [39.4 kB]
+Get:27 http://jp.archive.ubuntu.com precise-backports/multiverse Sources [5,737 B]
+Get:28 http://jp.archive.ubuntu.com precise-backports/main amd64 Packages [6,412 B]
+Get:29 http://jp.archive.ubuntu.com precise-backports/restricted amd64 Packages [14 B]
+Get:30 http://jp.archive.ubuntu.com precise-backports/universe amd64 Packages [42.4 kB]
+Get:31 http://jp.archive.ubuntu.com precise-backports/multiverse amd64 Packages [5,405 B]
+Get:32 http://jp.archive.ubuntu.com precise-backports/main i386 Packages [6,420 B]
+Get:33 http://jp.archive.ubuntu.com precise-backports/restricted i386 Packages [14 B]
+Get:34 http://jp.archive.ubuntu.com precise-backports/universe i386 Packages [42.2 kB]
+Get:35 http://jp.archive.ubuntu.com precise-backports/multiverse i386 Packages [5,399 B]
+Get:36 http://jp.archive.ubuntu.com precise-backports/main TranslationIndex [72 B]
+Get:37 http://jp.archive.ubuntu.com precise-backports/multiverse TranslationIndex [72 B]
+Get:38 http://jp.archive.ubuntu.com precise-backports/restricted TranslationIndex [70 B]
+Get:39 http://jp.archive.ubuntu.com precise-backports/universe TranslationIndex [73 B]
+Hit http://jp.archive.ubuntu.com precise/main Translation-en
+Hit http://jp.archive.ubuntu.com precise/multiverse Translation-en
+Hit http://jp.archive.ubuntu.com precise/restricted Translation-en
+Hit http://jp.archive.ubuntu.com precise/universe Translation-en
+Hit http://jp.archive.ubuntu.com precise-updates/main Translation-en
+Hit http://jp.archive.ubuntu.com precise-updates/multiverse Translation-en
+Hit http://jp.archive.ubuntu.com precise-updates/restricted Translation-en
+Hit http://jp.archive.ubuntu.com precise-updates/universe Translation-en
+Hit http://jp.archive.ubuntu.com precise-backports/main Translation-en
+Get:40 http://jp.archive.ubuntu.com precise-backports/multiverse Translation-en [4,838 B]
+Hit http://jp.archive.ubuntu.com precise-backports/restricted Translation-en
+Hit http://jp.archive.ubuntu.com precise-backports/universe Translation-en
+Get:41 http://security.ubuntu.com precise-security/restricted amd64 Packages [4,627 B]
+Get:42 http://security.ubuntu.com precise-security/universe amd64 Packages [96.7 kB]
+Get:43 http://security.ubuntu.com precise-security/multiverse amd64 Packages [2,451 B]
+Get:44 http://security.ubuntu.com precise-security/main i386 Packages [444 kB]
+Get:45 http://security.ubuntu.com precise-security/restricted i386 Packages [4,620 B]
+Get:46 http://security.ubuntu.com precise-security/universe i386 Packages [102 kB]
+Get:47 http://security.ubuntu.com precise-security/multiverse i386 Packages [2,644 B]
+Get:48 http://security.ubuntu.com precise-security/main TranslationIndex [74 B]
+Get:49 http://security.ubuntu.com precise-security/multiverse TranslationIndex [72 B]
+Get:50 http://security.ubuntu.com precise-security/restricted TranslationIndex [72 B]
+Get:51 http://security.ubuntu.com precise-security/universe TranslationIndex [73 B]
+Hit http://security.ubuntu.com precise-security/main Translation-en
+Hit http://security.ubuntu.com precise-security/multiverse Translation-en
+Hit http://security.ubuntu.com precise-security/restricted Translation-en
+Hit http://security.ubuntu.com precise-security/universe Translation-en
+Fetched 4,426 kB in 4s (944 kB/s)
+Reading package lists... Done
+ubuntu@vaslave2:~/vazuul/dnsmasq/build$ sudo apt-get install build-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+E: Unable to locate package build-dev
+ubuntu@vaslave2:~/vazuul/dnsmasq/build$ sudo apt-get install build-essential
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+build-essential is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 13 not upgraded.
+ubuntu@vaslave2:~/vazuul/dnsmasq/build$ sudo apt-get install fakeroot
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+fakeroot is already the newest version.
+0 upgraded, 0 newly installed, 0 to remove and 13 not upgraded.
+ubuntu@vaslave2:~/vazuul/dnsmasq/build$ sudo apt-get install devscripts
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following extra packages will be installed:
+  dctrl-tools diffstat dput gettext intltool-debian libapt-pkg-perl libclone-perl
+  libcommon-sense-perl libcroco3 libdigest-hmac-perl libemail-valid-perl
+  libencode-locale-perl libexporter-lite-perl libfile-listing-perl libfont-afm-perl
+  libgettextpo0 libhtml-form-perl libhtml-format-perl libhtml-parser-perl libhtml-tagset-perl
+  libhtml-tree-perl libhttp-cookies-perl libhttp-daemon-perl libhttp-date-perl
+  libhttp-message-perl libhttp-negotiate-perl libio-pty-perl libio-socket-inet6-perl
+  libio-socket-ssl-perl libio-stringy-perl libipc-run-perl libjson-perl libjson-xs-perl
+  liblwp-mediatypes-perl liblwp-protocol-https-perl libmailtools-perl libnet-dns-perl
+  libnet-domain-tld-perl libnet-http-perl libnet-ip-perl libnet-ssleay-perl
+  libparse-debcontrol-perl libsocket6-perl libtie-ixhash-perl libunistring0 liburi-perl
+  libwww-perl libwww-robotrules-perl lintian patchutils python-magic wdiff
+Suggested packages:
+  debtags bsd-mailx mailx cvs-buildpackage debian-keyring devscripts-el equivs gnuplot
+  libauthen-sasl-perl libcrypt-ssleay-perl libfile-desktopentry-perl libnet-smtp-ssl-perl
+  libsoap-lite-perl libterm-size-perl libyaml-syck-perl mutt svn-buildpackage mini-dinstall
+  bzr gettext-doc libdata-dump-perl libauthen-ntlm-perl binutils-multiarch
+  libtext-template-perl python-magic-dbg
+The following NEW packages will be installed:
+  dctrl-tools devscripts diffstat dput gettext intltool-debian libapt-pkg-perl libclone-perl
+  libcommon-sense-perl libcroco3 libdigest-hmac-perl libemail-valid-perl
+  libencode-locale-perl libexporter-lite-perl libfile-listing-perl libfont-afm-perl
+  libgettextpo0 libhtml-form-perl libhtml-format-perl libhtml-parser-perl libhtml-tagset-perl
+  libhtml-tree-perl libhttp-cookies-perl libhttp-daemon-perl libhttp-date-perl
+  libhttp-message-perl libhttp-negotiate-perl libio-pty-perl libio-socket-inet6-perl
+  libio-socket-ssl-perl libio-stringy-perl libipc-run-perl libjson-perl libjson-xs-perl
+  liblwp-mediatypes-perl liblwp-protocol-https-perl libmailtools-perl libnet-dns-perl
+  libnet-domain-tld-perl libnet-http-perl libnet-ip-perl libnet-ssleay-perl
+  libparse-debcontrol-perl libsocket6-perl libtie-ixhash-perl libunistring0 liburi-perl
+  libwww-perl libwww-robotrules-perl lintian patchutils python-magic wdiff
+0 upgraded, 53 newly installed, 0 to remove and 13 not upgraded.
+Need to get 5,460 kB of archives.
+After this operation, 18.2 MB of additional disk space will be used.
+Do you want to continue [Y/n]? y
+Get:1 http://jp.archive.ubuntu.com/ubuntu/ precise-updates/main libcroco3 amd64 0.6.5-1ubuntu0.1 [99.8 kB]
+Get:2 http://jp.archive.ubuntu.com/ubuntu/ precise/main libunistring0 amd64 0.9.3-5 [427 kB]
+Get:3 http://jp.archive.ubuntu.com/ubuntu/ precise/main libgettextpo0 amd64 0.18.1.1-5ubuntu3 [120 kB]
+Get:4 http://jp.archive.ubuntu.com/ubuntu/ precise/main dctrl-tools amd64 2.18ubuntu1 [83.5 kB]
+Get:5 http://jp.archive.ubuntu.com/ubuntu/ precise-updates/main devscripts amd64 2.11.6ubuntu1.6 [629 kB]
+Get:6 http://jp.archive.ubuntu.com/ubuntu/ precise/main diffstat amd64 1.54-1 [22.7 kB]
+Get:7 http://jp.archive.ubuntu.com/ubuntu/ precise/main dput all 0.9.6.2ubuntu1 [37.4 kB]
+Get:8 http://jp.archive.ubuntu.com/ubuntu/ precise/main gettext amd64 0.18.1.1-5ubuntu3 [1,188 kB]
+Get:9 http://jp.archive.ubuntu.com/ubuntu/ precise/main intltool-debian all 0.35.0+20060710.1 [31.6 kB]
+Get:10 http://jp.archive.ubuntu.com/ubuntu/ precise/main libapt-pkg-perl amd64 0.1.25build2 [82.9 kB]
+Get:11 http://jp.archive.ubuntu.com/ubuntu/ precise/main libclone-perl amd64 0.31-1build3 [11.2 kB]
+Get:12 http://jp.archive.ubuntu.com/ubuntu/ precise/main libcommon-sense-perl all 3.4-1 [20.7 kB]
+Get:13 http://jp.archive.ubuntu.com/ubuntu/ precise/main libdigest-hmac-perl all 1.03+dfsg-1 [12.1 kB]
+Get:14 http://jp.archive.ubuntu.com/ubuntu/ precise/main libmailtools-perl all 2.08-1 [84.0 kB]
+Get:15 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnet-ip-perl all 1.25-3 [28.1 kB]
+Get:16 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnet-dns-perl amd64 0.66-2ubuntu3 [275 kB]
+Get:17 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnet-domain-tld-perl all 1.69-1 [10.9 kB]
+Get:18 http://jp.archive.ubuntu.com/ubuntu/ precise/main libemail-valid-perl all 0.185-1 [15.8 kB]
+Get:19 http://jp.archive.ubuntu.com/ubuntu/ precise/main libencode-locale-perl all 1.02-2 [12.0 kB]
+Get:20 http://jp.archive.ubuntu.com/ubuntu/ precise/main libexporter-lite-perl all 0.02-2 [8,924 B]
+Get:21 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhttp-date-perl all 6.00-1 [10.1 kB]
+Get:22 http://jp.archive.ubuntu.com/ubuntu/ precise/main libfile-listing-perl all 6.03-1 [9,690 B]
+Get:23 http://jp.archive.ubuntu.com/ubuntu/ precise/main libfont-afm-perl all 1.20-1 [14.3 kB]
+Get:24 http://jp.archive.ubuntu.com/ubuntu/ precise/main liburi-perl all 1.59-1 [90.3 kB]
+Get:25 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhtml-tagset-perl all 3.20-2 [13.5 kB]
+Get:26 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhtml-parser-perl amd64 3.69-1build1 [97.3 kB]
+Get:27 http://jp.archive.ubuntu.com/ubuntu/ precise/main liblwp-mediatypes-perl all 6.01-1 [17.5 kB]
+Get:28 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhttp-message-perl all 6.01-1 [77.6 kB]
+Get:29 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhtml-form-perl all 6.00-1 [22.8 kB]
+Get:30 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhtml-tree-perl all 4.2-1 [205 kB]
+Get:31 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhtml-format-perl all 2.10-1 [40.6 kB]
+Get:32 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhttp-cookies-perl all 6.00-2 [23.3 kB]
+Get:33 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhttp-daemon-perl all 6.00-1 [16.7 kB]
+Get:34 http://jp.archive.ubuntu.com/ubuntu/ precise/main libhttp-negotiate-perl all 6.00-2 [13.4 kB]
+Get:35 http://jp.archive.ubuntu.com/ubuntu/ precise/main libio-pty-perl amd64 1:1.08-1build2 [36.7 kB]
+Get:36 http://jp.archive.ubuntu.com/ubuntu/ precise/main libsocket6-perl amd64 0.23-1build2 [21.9 kB]
+Get:37 http://jp.archive.ubuntu.com/ubuntu/ precise/main libio-socket-inet6-perl all 2.69-2 [14.3 kB]
+Get:38 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnet-ssleay-perl amd64 1.42-1build1 [188 kB]
+Get:39 http://jp.archive.ubuntu.com/ubuntu/ precise/main libio-socket-ssl-perl all 1.53-1 [47.5 kB]
+Get:40 http://jp.archive.ubuntu.com/ubuntu/ precise/main libio-stringy-perl all 2.110-5 [93.5 kB]
+Get:41 http://jp.archive.ubuntu.com/ubuntu/ precise/main libipc-run-perl all 0.90-1 [100 kB]
+Get:42 http://jp.archive.ubuntu.com/ubuntu/ precise/main libjson-perl all 2.53-1 [93.7 kB]
+Get:43 http://jp.archive.ubuntu.com/ubuntu/ precise/main libjson-xs-perl amd64 2.320-1build1 [81.5 kB]
+Get:44 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnet-http-perl all 6.02-1 [23.5 kB]
+Get:45 http://jp.archive.ubuntu.com/ubuntu/ precise/main libwww-robotrules-perl all 6.01-1 [14.1 kB]
+Get:46 http://jp.archive.ubuntu.com/ubuntu/ precise/main libwww-perl all 6.03-1 [156 kB]
+Get:47 http://jp.archive.ubuntu.com/ubuntu/ precise/main liblwp-protocol-https-perl all 6.02-1 [6,746 B]
+Get:48 http://jp.archive.ubuntu.com/ubuntu/ precise/main libparse-debcontrol-perl all 2.005-3 [23.6 kB]
+Get:49 http://jp.archive.ubuntu.com/ubuntu/ precise/main libtie-ixhash-perl all 1.21-2 [11.9 kB]
+Get:50 http://jp.archive.ubuntu.com/ubuntu/ precise/main patchutils amd64 0.3.2-1.1 [91.2 kB]
+Get:51 http://jp.archive.ubuntu.com/ubuntu/ precise-updates/main lintian all 2.5.6ubuntu0.1 [519 kB]
+Get:52 http://jp.archive.ubuntu.com/ubuntu/ precise/main wdiff amd64 0.6.5-1 [78.8 kB]
+Get:53 http://jp.archive.ubuntu.com/ubuntu/ precise-updates/main python-magic amd64 5.09-2ubuntu0.4 [4,854 B]
+Fetched 5,460 kB in 3s (1,494 kB/s)
+Extracting templates from packages: 100%
+Selecting previously unselected package libcroco3.
+(Reading database ... 138228 files and directories currently installed.)
+Unpacking libcroco3 (from .../libcroco3_0.6.5-1ubuntu0.1_amd64.deb) ...
+Selecting previously unselected package libunistring0.
+Unpacking libunistring0 (from .../libunistring0_0.9.3-5_amd64.deb) ...
+Selecting previously unselected package libgettextpo0.
+Unpacking libgettextpo0 (from .../libgettextpo0_0.18.1.1-5ubuntu3_amd64.deb) ...
+Selecting previously unselected package dctrl-tools.
+Unpacking dctrl-tools (from .../dctrl-tools_2.18ubuntu1_amd64.deb) ...
+Selecting previously unselected package devscripts.
+Unpacking devscripts (from .../devscripts_2.11.6ubuntu1.6_amd64.deb) ...
+Selecting previously unselected package diffstat.
+Unpacking diffstat (from .../diffstat_1.54-1_amd64.deb) ...
+Selecting previously unselected package dput.
+Unpacking dput (from .../dput_0.9.6.2ubuntu1_all.deb) ...
+Selecting previously unselected package gettext.
+Unpacking gettext (from .../gettext_0.18.1.1-5ubuntu3_amd64.deb) ...
+Selecting previously unselected package intltool-debian.
+Unpacking intltool-debian (from .../intltool-debian_0.35.0+20060710.1_all.deb) ...
+Selecting previously unselected package libapt-pkg-perl.
+Unpacking libapt-pkg-perl (from .../libapt-pkg-perl_0.1.25build2_amd64.deb) ...
+Selecting previously unselected package libclone-perl.
+Unpacking libclone-perl (from .../libclone-perl_0.31-1build3_amd64.deb) ...
+Selecting previously unselected package libcommon-sense-perl.
+Unpacking libcommon-sense-perl (from .../libcommon-sense-perl_3.4-1_all.deb) ...
+Selecting previously unselected package libdigest-hmac-perl.
+Unpacking libdigest-hmac-perl (from .../libdigest-hmac-perl_1.03+dfsg-1_all.deb) ...
+Selecting previously unselected package libmailtools-perl.
+Unpacking libmailtools-perl (from .../libmailtools-perl_2.08-1_all.deb) ...
+Selecting previously unselected package libnet-ip-perl.
+Unpacking libnet-ip-perl (from .../libnet-ip-perl_1.25-3_all.deb) ...
+Selecting previously unselected package libnet-dns-perl.
+Unpacking libnet-dns-perl (from .../libnet-dns-perl_0.66-2ubuntu3_amd64.deb) ...
+Selecting previously unselected package libnet-domain-tld-perl.
+Unpacking libnet-domain-tld-perl (from .../libnet-domain-tld-perl_1.69-1_all.deb) ...
+Selecting previously unselected package libemail-valid-perl.
+Unpacking libemail-valid-perl (from .../libemail-valid-perl_0.185-1_all.deb) ...
+Selecting previously unselected package libencode-locale-perl.
+Unpacking libencode-locale-perl (from .../libencode-locale-perl_1.02-2_all.deb) ...
+Selecting previously unselected package libexporter-lite-perl.
+Unpacking libexporter-lite-perl (from .../libexporter-lite-perl_0.02-2_all.deb) ...
+Selecting previously unselected package libhttp-date-perl.
+Unpacking libhttp-date-perl (from .../libhttp-date-perl_6.00-1_all.deb) ...
+Selecting previously unselected package libfile-listing-perl.
+Unpacking libfile-listing-perl (from .../libfile-listing-perl_6.03-1_all.deb) ...
+Selecting previously unselected package libfont-afm-perl.
+Unpacking libfont-afm-perl (from .../libfont-afm-perl_1.20-1_all.deb) ...
+Selecting previously unselected package liburi-perl.
+Unpacking liburi-perl (from .../liburi-perl_1.59-1_all.deb) ...
+Selecting previously unselected package libhtml-tagset-perl.
+Unpacking libhtml-tagset-perl (from .../libhtml-tagset-perl_3.20-2_all.deb) ...
+Selecting previously unselected package libhtml-parser-perl.
+Unpacking libhtml-parser-perl (from .../libhtml-parser-perl_3.69-1build1_amd64.deb) ...
+Selecting previously unselected package liblwp-mediatypes-perl.
+Unpacking liblwp-mediatypes-perl (from .../liblwp-mediatypes-perl_6.01-1_all.deb) ...
+Selecting previously unselected package libhttp-message-perl.
+Unpacking libhttp-message-perl (from .../libhttp-message-perl_6.01-1_all.deb) ...
+Selecting previously unselected package libhtml-form-perl.
+Unpacking libhtml-form-perl (from .../libhtml-form-perl_6.00-1_all.deb) ...
+Selecting previously unselected package libhtml-tree-perl.
+Unpacking libhtml-tree-perl (from .../libhtml-tree-perl_4.2-1_all.deb) ...
+Selecting previously unselected package libhtml-format-perl.
+Unpacking libhtml-format-perl (from .../libhtml-format-perl_2.10-1_all.deb) ...
+Selecting previously unselected package libhttp-cookies-perl.
+Unpacking libhttp-cookies-perl (from .../libhttp-cookies-perl_6.00-2_all.deb) ...
+Selecting previously unselected package libhttp-daemon-perl.
+Unpacking libhttp-daemon-perl (from .../libhttp-daemon-perl_6.00-1_all.deb) ...
+Selecting previously unselected package libhttp-negotiate-perl.
+Unpacking libhttp-negotiate-perl (from .../libhttp-negotiate-perl_6.00-2_all.deb) ...
+Selecting previously unselected package libio-pty-perl.
+Unpacking libio-pty-perl (from .../libio-pty-perl_1%3a1.08-1build2_amd64.deb) ...
+Selecting previously unselected package libsocket6-perl.
+Unpacking libsocket6-perl (from .../libsocket6-perl_0.23-1build2_amd64.deb) ...
+Selecting previously unselected package libio-socket-inet6-perl.
+Unpacking libio-socket-inet6-perl (from .../libio-socket-inet6-perl_2.69-2_all.deb) ...
+Selecting previously unselected package libnet-ssleay-perl.
+Unpacking libnet-ssleay-perl (from .../libnet-ssleay-perl_1.42-1build1_amd64.deb) ...
+Selecting previously unselected package libio-socket-ssl-perl.
+Unpacking libio-socket-ssl-perl (from .../libio-socket-ssl-perl_1.53-1_all.deb) ...
+Selecting previously unselected package libio-stringy-perl.
+Unpacking libio-stringy-perl (from .../libio-stringy-perl_2.110-5_all.deb) ...
+Selecting previously unselected package libipc-run-perl.
+Unpacking libipc-run-perl (from .../libipc-run-perl_0.90-1_all.deb) ...
+Selecting previously unselected package libjson-perl.
+Unpacking libjson-perl (from .../libjson-perl_2.53-1_all.deb) ...
+Selecting previously unselected package libjson-xs-perl.
+Unpacking libjson-xs-perl (from .../libjson-xs-perl_2.320-1build1_amd64.deb) ...
+Selecting previously unselected package libnet-http-perl.
+Unpacking libnet-http-perl (from .../libnet-http-perl_6.02-1_all.deb) ...
+Selecting previously unselected package libwww-robotrules-perl.
+Unpacking libwww-robotrules-perl (from .../libwww-robotrules-perl_6.01-1_all.deb) ...
+Selecting previously unselected package libwww-perl.
+Unpacking libwww-perl (from .../libwww-perl_6.03-1_all.deb) ...
+Selecting previously unselected package liblwp-protocol-https-perl.
+Unpacking liblwp-protocol-https-perl (from .../liblwp-protocol-https-perl_6.02-1_all.deb) ...
+Selecting previously unselected package libparse-debcontrol-perl.
+Unpacking libparse-debcontrol-perl (from .../libparse-debcontrol-perl_2.005-3_all.deb) ...
+Selecting previously unselected package libtie-ixhash-perl.
+Unpacking libtie-ixhash-perl (from .../libtie-ixhash-perl_1.21-2_all.deb) ...
+Selecting previously unselected package patchutils.
+Unpacking patchutils (from .../patchutils_0.3.2-1.1_amd64.deb) ...
+Selecting previously unselected package lintian.
+Unpacking lintian (from .../lintian_2.5.6ubuntu0.1_all.deb) ...
+Selecting previously unselected package wdiff.
+Unpacking wdiff (from .../wdiff_0.6.5-1_amd64.deb) ...
+Selecting previously unselected package python-magic.
+Unpacking python-magic (from .../python-magic_5.09-2ubuntu0.4_amd64.deb) ...
+Processing triggers for man-db ...
+Processing triggers for install-info ...
+Setting up libcroco3 (0.6.5-1ubuntu0.1) ...
+Setting up libunistring0 (0.9.3-5) ...
+Setting up libgettextpo0 (0.18.1.1-5ubuntu3) ...
+Setting up dctrl-tools (2.18ubuntu1) ...
+Setting up devscripts (2.11.6ubuntu1.6) ...
+Setting up diffstat (1.54-1) ...
+Setting up dput (0.9.6.2ubuntu1) ...
+Setting up gettext (0.18.1.1-5ubuntu3) ...
+Setting up intltool-debian (0.35.0+20060710.1) ...
+Setting up libapt-pkg-perl (0.1.25build2) ...
+Setting up libclone-perl (0.31-1build3) ...
+Setting up libcommon-sense-perl (3.4-1) ...
+Setting up libdigest-hmac-perl (1.03+dfsg-1) ...
+Setting up libmailtools-perl (2.08-1) ...
+Setting up libnet-ip-perl (1.25-3) ...
+Setting up libnet-dns-perl (0.66-2ubuntu3) ...
+Setting up libnet-domain-tld-perl (1.69-1) ...
+Setting up libemail-valid-perl (0.185-1) ...
+Setting up libencode-locale-perl (1.02-2) ...
+Setting up libexporter-lite-perl (0.02-2) ...
+Setting up libhttp-date-perl (6.00-1) ...
+Setting up libfile-listing-perl (6.03-1) ...
+Setting up libfont-afm-perl (1.20-1) ...
+Setting up liburi-perl (1.59-1) ...
+Setting up libhtml-tagset-perl (3.20-2) ...
+Setting up libhtml-parser-perl (3.69-1build1) ...
+Setting up liblwp-mediatypes-perl (6.01-1) ...
+Setting up libhttp-message-perl (6.01-1) ...
+Setting up libhtml-form-perl (6.00-1) ...
+Setting up libhtml-tree-perl (4.2-1) ...
+Setting up libhtml-format-perl (2.10-1) ...
+Setting up libhttp-cookies-perl (6.00-2) ...
+Setting up libhttp-daemon-perl (6.00-1) ...
+Setting up libhttp-negotiate-perl (6.00-2) ...
+Setting up libio-pty-perl (1:1.08-1build2) ...
+Setting up libsocket6-perl (0.23-1build2) ...
+Setting up libio-socket-inet6-perl (2.69-2) ...
+Setting up libnet-ssleay-perl (1.42-1build1) ...
+Setting up libio-socket-ssl-perl (1.53-1) ...
+Setting up libio-stringy-perl (2.110-5) ...
+Setting up libipc-run-perl (0.90-1) ...
+Setting up libjson-perl (2.53-1) ...
+Setting up libjson-xs-perl (2.320-1build1) ...
+Setting up libnet-http-perl (6.02-1) ...
+Setting up libwww-robotrules-perl (6.01-1) ...
+Setting up libtie-ixhash-perl (1.21-2) ...
+Setting up patchutils (0.3.2-1.1) ...
+Setting up lintian (2.5.6ubuntu0.1) ...
+Setting up wdiff (0.6.5-1) ...
+Setting up python-magic (5.09-2ubuntu0.4) ...
+Setting up libwww-perl (6.03-1) ...
+Setting up liblwp-protocol-https-perl (6.02-1) ...
+Setting up libparse-debcontrol-perl (2.005-3) ...
+Processing triggers for libc-bin ...
+ldconfig deferred processing now taking place
+ubuntu@vaslave2:~/vazuul/dnsmasq/build$
+
+
+- install build depends packages
+
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$ sudo apt-get install libnetfilter-conntrack-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following extra packages will be installed:
+  libnfnetlink-dev pkg-config
+The following NEW packages will be installed:
+  libnetfilter-conntrack-dev libnfnetlink-dev pkg-config
+0 upgraded, 3 newly installed, 0 to remove and 13 not upgraded.
+Need to get 69.3 kB of archives.
+After this operation, 346 kB of additional disk space will be used.
+Do you want to continue [Y/n]? y
+Get:1 http://jp.archive.ubuntu.com/ubuntu/ precise/main pkg-config amd64 0.26-1ubuntu1 [40.9 kB]
+Get:2 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnfnetlink-dev amd64 1.0.0-1 [20.4 kB]
+Get:3 http://jp.archive.ubuntu.com/ubuntu/ precise/main libnetfilter-conntrack-dev amd64 0.9.1-1ubuntu1 [8,000 B]
+Fetched 69.3 kB in 0s (362 kB/s)
+Selecting previously unselected package pkg-config.
+(Reading database ... 139989 files and directories currently installed.)
+Unpacking pkg-config (from .../pkg-config_0.26-1ubuntu1_amd64.deb) ...
+Selecting previously unselected package libnfnetlink-dev.
+Unpacking libnfnetlink-dev (from .../libnfnetlink-dev_1.0.0-1_amd64.deb) ...
+Selecting previously unselected package libnetfilter-conntrack-dev.
+Unpacking libnetfilter-conntrack-dev (from .../libnetfilter-conntrack-dev_0.9.1-1ubuntu1_amd64.deb) ...
+Processing triggers for man-db ...
+Setting up pkg-config (0.26-1ubuntu1) ...
+Setting up libnfnetlink-dev (1.0.0-1) ...
+Setting up libnetfilter-conntrack-dev (0.9.1-1ubuntu1) ...
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$ sudo apt-get install libidn11-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following NEW packages will be installed:
+  libidn11-dev
+0 upgraded, 1 newly installed, 0 to remove and 13 not upgraded.
+Need to get 636 kB of archives.
+After this operation, 1,015 kB of additional disk space will be used.
+Get:1 http://jp.archive.ubuntu.com/ubuntu/ precise/main libidn11-dev amd64 1.23-2 [636 kB]
+Fetched 636 kB in 0s (838 kB/s)
+Selecting previously unselected package libidn11-dev.
+(Reading database ... 140024 files and directories currently installed.)
+Unpacking libidn11-dev (from .../libidn11-dev_1.23-2_amd64.deb) ...
+Processing triggers for install-info ...
+Processing triggers for man-db ...
+Setting up libidn11-dev (1.23-2) ...
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$ sudo apt-get install libdbus-1-dev
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following NEW packages will be installed:
+  libdbus-1-dev
+0 upgraded, 1 newly installed, 0 to remove and 13 not upgraded.
+Need to get 213 kB of archives.
+After this operation, 888 kB of additional disk space will be used.
+Get:1 http://jp.archive.ubuntu.com/ubuntu/ precise-updates/main libdbus-1-dev amd64 1.4.18-1ubuntu1.5 [213 kB]
+Fetched 213 kB in 0s (676 kB/s)
+Selecting previously unselected package libdbus-1-dev.
+(Reading database ... 140100 files and directories currently installed.)
+Unpacking libdbus-1-dev (from .../libdbus-1-dev_1.4.18-1ubuntu1.5_amd64.deb) ...
+Setting up libdbus-1-dev (1.4.18-1ubuntu1.5) ...
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$
+
+
+- build
+
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$ dpkg-buildpackage -us -uc -rfakeroot
+dpkg-buildpackage: export CFLAGS from dpkg-buildflags (origin: vendor): -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security
+dpkg-buildpackage: export CPPFLAGS from dpkg-buildflags (origin: vendor): -D_FORTIFY_SOURCE=2
+dpkg-buildpackage: export CXXFLAGS from dpkg-buildflags (origin: vendor): -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security
+dpkg-buildpackage: export FFLAGS from dpkg-buildflags (origin: vendor): -g -O2
+dpkg-buildpackage: export LDFLAGS from dpkg-buildflags (origin: vendor): -Wl,-Bsymbolic-functions -Wl,-z,relro
+dpkg-buildpackage: source package dnsmasq
+dpkg-buildpackage: source version 2.68-1
+dpkg-buildpackage: source changed by Simon Kelley <simon@thekelleys.org.uk>
+dpkg-buildpackage: host architecture amd64
+ dpkg-source --before-build dnsmasq-2.68
+ fakeroot debian/rules clean
+test -f Makefile -a -f debian/rules
+rm -rf debian/daemon debian/base debian/utils debian/*~ debian/files debian/substvars debian/utils-substvars
+make clean
+make[1]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68'
+rm -f src/*.mo src/*.pot
+rm -f src/.configured src/*.o src/dnsmasq.a src/dnsmasq
+rm -f src/dnsmasq_baseline
+rm -f core */core
+rm -f *~ contrib/*/*~ */*~
+make[1]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68'
+make -C contrib/wrt clean
+make[1]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/contrib/wrt'
+rm -f *~ *.o core dhcp_release dhcp_lease_time
+make[1]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/contrib/wrt'
+ dpkg-source -b dnsmasq-2.68
+dpkg-source: info: using source format `1.0'
+dpkg-source: info: building dnsmasq using existing dnsmasq_2.68.orig.tar.gz
+dpkg-source: info: building dnsmasq in dnsmasq_2.68-1.diff.gz
+dpkg-source: info: building dnsmasq in dnsmasq_2.68-1.dsc
+ debian/rules build
+make: Nothing to be done for `build'.
+ fakeroot debian/rules binary
+test root = "`whoami`"
+test -f Makefile -a -f debian/rules
+rm -rf debian/base
+install -m 755 \
+                -d debian/base/DEBIAN \
+                -d debian/base/etc/dbus-1/system.d \
+                -d debian/base/usr/share/doc/dnsmasq-base \
+                -d debian/base/usr/share/doc/dnsmasq-base/examples \
+                -d debian/base/var/run \
+                -d debian/base/var/lib/misc
+make install-i18n PREFIX=/usr DESTDIR=`pwd`/debian/base CFLAGS="-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W" LDFLAGS="-Wl,-Bsymbolic-functions -Wl,-z,relro" COPTS=" -DHAVE_DBUS -DHAVE_CONNTRACK" CC=gcc
+make[1]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c cache.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c rfc1035.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c util.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c option.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c forward.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c network.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c dnsmasq.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c dhcp.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c lease.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c rfc2131.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c netlink.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c dbus.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c bpf.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c helper.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c tftp.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c log.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c conntrack.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c dhcp6.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c rfc3315.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c dhcp-common.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c outpacket.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c radv.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c slaac.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c auth.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c ipset.c
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -DHAVE_DBUS -DHAVE_CONNTRACK -DLOCALEDIR='"/usr/share/locale"' -DVERSION='"2.68"' -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include           -c domain.c
+gcc -Wl,-Bsymbolic-functions -Wl,-z,relro -o dnsmasq cache.o rfc1035.o util.o option.o forward.o network.o dnsmasq.o dhcp.o lease.o rfc2131.o netlink.o dbus.o bpf.o helper.o tftp.o log.o conntrack.o dhcp6.o rfc3315.o dhcp-common.o outpacket.o radv.o slaac.o auth.o ipset.o domain.o -ldbus-1 -lpthread -lrt    -lnetfilter_conntrack -lnfnetlink      -lidn
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+for f in `cd po; echo *.po`; do \
+                cd /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68 && cd src && make top="/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68" -f /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/Makefile ${f%.po}.mo; \
+        done
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+xgettext -d dnsmasq --foreign-user --omit-header --keyword=_ -o dnsmasq.pot -i cache.c rfc1035.c util.c option.c forward.c network.c dnsmasq.c dhcp.c lease.c rfc2131.c netlink.c dbus.c bpf.c helper.c tftp.c log.c conntrack.c dhcp6.c rfc3315.c dhcp-common.c outpacket.c radv.c slaac.c auth.c ipset.c domain.c
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/de.po dnsmasq.pot | msgfmt -o de.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/es.po dnsmasq.pot | msgfmt -o es.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/fi.po dnsmasq.pot | msgfmt -o fi.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/fr.po dnsmasq.pot | msgfmt -o fr.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/id.po dnsmasq.pot | msgfmt -o id.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/it.po dnsmasq.pot | msgfmt -o it.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/no.po dnsmasq.pot | msgfmt -o no.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/pl.po dnsmasq.pot | msgfmt -o pl.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/pt_BR.po dnsmasq.pot | msgfmt -o pt_BR.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+make[2]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+msgmerge -o - /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/po/ro.po dnsmasq.pot | msgfmt -o ro.mo -
+........................................... done.
+make[2]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/src'
+install -d /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/debian/base/usr/sbin -d /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/debian/base/usr/share/man/man8
+install -m 644 man/dnsmasq.8 /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/debian/base/usr/share/man/man8
+install -m 755 src/dnsmasq /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/debian/base/usr/sbin
+cd src; /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/bld/install-mo /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/debian/base/usr/share/locale install
+installing de/LC_MESSAGES/dnsmasq.mo
+installing es/LC_MESSAGES/dnsmasq.mo
+installing fi/LC_MESSAGES/dnsmasq.mo
+installing fr/LC_MESSAGES/dnsmasq.mo
+installing id/LC_MESSAGES/dnsmasq.mo
+installing it/LC_MESSAGES/dnsmasq.mo
+installing no/LC_MESSAGES/dnsmasq.mo
+installing pl/LC_MESSAGES/dnsmasq.mo
+installing pt_BR/LC_MESSAGES/dnsmasq.mo
+installing ro/LC_MESSAGES/dnsmasq.mo
+cd man; ../bld/install-man /home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/debian/base/usr/share/man install
+installing es/man8/dnsmasq.8
+installing fr/man8/dnsmasq.8
+make[1]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68'
+install -m 644 doc.html debian/base/usr/share/doc/dnsmasq-base/.
+install -m 644 setup.html debian/base/usr/share/doc/dnsmasq-base/.
+install -m 644 dnsmasq.conf.example debian/base/usr/share/doc/dnsmasq-base/examples/.
+install -m 644 FAQ debian/base/usr/share/doc/dnsmasq-base/.
+gzip -9 debian/base/usr/share/doc/dnsmasq-base/FAQ
+install -m 644 CHANGELOG debian/base/usr/share/doc/dnsmasq-base/changelog
+gzip -9 debian/base/usr/share/doc/dnsmasq-base/changelog
+install -m 644 CHANGELOG.archive debian/base/usr/share/doc/dnsmasq-base/changelog.archive
+gzip -9 debian/base/usr/share/doc/dnsmasq-base/changelog.archive
+install -m 644 dbus/DBus-interface debian/base/usr/share/doc/dnsmasq-base/.
+gzip -9 debian/base/usr/share/doc/dnsmasq-base/DBus-interface
+install -m 644 debian/dnsmasq-base.conffiles debian/base/DEBIAN/conffiles
+install -m 755 debian/dnsmasq-base.postinst debian/base/DEBIAN/postinst
+install -m 755 debian/dnsmasq-base.postrm  debian/base/DEBIAN/postrm
+install -m 644 debian/changelog debian/base/usr/share/doc/dnsmasq-base/changelog.Debian
+gzip -9 debian/base/usr/share/doc/dnsmasq-base/changelog.Debian
+install -m 644 debian/readme debian/base/usr/share/doc/dnsmasq-base/README.Debian
+install -m 644 debian/copyright debian/base/usr/share/doc/dnsmasq-base/copyright
+install -m 644 debian/dbus.conf debian/base/etc/dbus-1/system.d/dnsmasq.conf
+gzip -9 debian/base/usr/share/man/man8/dnsmasq.8
+for f in debian/base/usr/share/man/*; do \
+                if [ -f $f/man8/dnsmasq.8 ]; then \
+                       gzip -9 $f/man8/dnsmasq.8 ; \
+                fi \
+        done
+strip -R .note -R .comment debian/base/usr/sbin/dnsmasq
+cd debian/base && find . -type f ! -regex '.*DEBIAN/.*' -printf '%P\0' | xargs -r0 md5sum > DEBIAN/md5sums
+dpkg-shlibdeps --warnings=1 debian/base/usr/sbin/dnsmasq
+dpkg-gencontrol  -pdnsmasq-base -Pdebian/base
+chown -R root.root debian/base
+chmod -R g-ws debian/base
+dpkg --build debian/base ..
+dpkg-deb: building package `dnsmasq-base' in `../dnsmasq-base_2.68-1_amd64.deb'.
+rm -rf debian/utils
+install -m 755 -d debian/utils/DEBIAN \
+                       -d debian/utils/usr/share/man/man1 \
+                       -d debian/utils/usr/bin \
+                       -d debian/utils/usr/share/doc/dnsmasq-utils
+make -C contrib/wrt PREFIX=/usr DESTDIR=`pwd`/debian/utils CFLAGS="-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W" LDFLAGS="-Wl,-Bsymbolic-functions -Wl,-z,relro" COPTS=" -DHAVE_DBUS -DHAVE_CONNTRACK" CC=gcc
+make[1]: Entering directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/contrib/wrt'
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -D_FORTIFY_SOURCE=2 -Wl,-Bsymbolic-functions -Wl,-z,relro  dhcp_release.c   -o dhcp_release
+gcc -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -Wall -W -D_FORTIFY_SOURCE=2 -Wl,-Bsymbolic-functions -Wl,-z,relro  dhcp_lease_time.c   -o dhcp_lease_time
+make[1]: Leaving directory `/home/ubuntu/vazuul/dnsmasq/build/dnsmasq-2.68/contrib/wrt'
+install -m 755 contrib/wrt/dhcp_release debian/utils/usr/bin/dhcp_release
+install -m 644 contrib/wrt/dhcp_release.1 debian/utils/usr/share/man/man1/dhcp_release.1
+gzip -9 debian/utils/usr/share/man/man1/dhcp_release.1
+install -m 755 contrib/wrt/dhcp_lease_time debian/utils/usr/bin/dhcp_lease_time
+install -m 644 contrib/wrt/dhcp_lease_time.1 debian/utils/usr/share/man/man1/dhcp_lease_time.1
+install -m 644 debian/copyright debian/utils/usr/share/doc/dnsmasq-utils/copyright
+install -m 644 debian/changelog debian/utils/usr/share/doc/dnsmasq-utils/changelog.Debian
+gzip -9 debian/utils/usr/share/doc/dnsmasq-utils/changelog.Debian
+gzip -9 debian/utils/usr/share/man/man1/dhcp_lease_time.1
+strip -R .note -R .comment debian/utils/usr/bin/dhcp_release
+strip -R .note -R .comment debian/utils/usr/bin/dhcp_lease_time
+cd debian/utils && find . -type f ! -regex '.*DEBIAN/.*' -printf '%P\0' | xargs -r0 md5sum > DEBIAN/md5sums
+dpkg-shlibdeps -Tdebian/utils-substvars debian/utils/usr/bin/dhcp_release debian/utils/usr/bin/dhcp_lease_time
+dpkg-gencontrol  -Tdebian/utils-substvars -pdnsmasq-utils -Pdebian/utils
+chown -R root.root debian/utils
+chmod -R g-ws debian/utils
+dpkg --build debian/utils ..
+dpkg-deb: building package `dnsmasq-utils' in `../dnsmasq-utils_2.68-1_amd64.deb'.
+test -f Makefile -a -f debian/rules
+rm -rf debian/daemon
+install -m 755 \
+                -d debian/daemon/DEBIAN \
+                -d debian/daemon/usr/share/doc \
+                -d debian/daemon/etc/init.d \
+                -d debian/daemon/etc/dnsmasq.d \
+                -d debian/daemon/etc/resolvconf/update.d \
+                -d debian/daemon/usr/lib/resolvconf/dpkg-event.d \
+                -d debian/daemon/etc/default \
+                -d debian/daemon/lib/systemd/system \
+                -d debian/daemon/etc/insserv.conf.d
+install -m 644 debian/conffiles debian/daemon/DEBIAN
+install -m 755 debian/postinst debian/postrm debian/prerm debian/daemon/DEBIAN
+install -m 755 debian/init debian/daemon/etc/init.d/dnsmasq
+install -m 755 debian/resolvconf debian/daemon/etc/resolvconf/update.d/dnsmasq
+install -m 755 debian/resolvconf-package debian/daemon/usr/lib/resolvconf/dpkg-event.d/dnsmasq
+install -m 644 debian/default debian/daemon/etc/default/dnsmasq
+install -m 644 dnsmasq.conf.example debian/daemon/etc/dnsmasq.conf
+install -m 644 debian/readme.dnsmasq.d debian/daemon/etc/dnsmasq.d/README
+install -m 644 debian/systemd.service debian/daemon/lib/systemd/system/dnsmasq.service
+install -m 644 debian/insserv debian/daemon/etc/insserv.conf.d/dnsmasq
+ln -s dnsmasq-base debian/daemon/usr/share/doc/dnsmasq
+cd debian/daemon && find . -type f ! -regex '.*DEBIAN/.*' -printf '%P\0' | xargs -r0 md5sum > DEBIAN/md5sums
+dpkg-gencontrol  -T -pdnsmasq -Pdebian/daemon
+chown -R root.root debian/daemon
+chmod -R g-ws debian/daemon
+dpkg --build debian/daemon ..
+dpkg-deb: building package `dnsmasq' in `../dnsmasq_2.68-1_all.deb'.
+ dpkg-genchanges  >../dnsmasq_2.68-1_amd64.changes
+dpkg-genchanges: including full source code in upload
+ dpkg-source --after-build dnsmasq-2.68
+dpkg-buildpackage: full upload (original source is included)
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$ ls
+Android.mk  CHANGELOG.archive  COPYING-v3  dnsmasq.conf.example  logo      po          VERSION
+bld         contrib            dbus        doc.html              Makefile  setup.html
+CHANGELOG   COPYING            debian      FAQ                   man       src
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$ ls ..
+dnsmasq-2.68                  dnsmasq_2.68-1.diff.gz    dnsmasq-base_2.68-1_amd64.deb
+dnsmasq_2.68-1_all.deb        dnsmasq_2.68-1.dsc        dnsmasq-utils_2.68-1_amd64.deb
+dnsmasq_2.68-1_amd64.changes  dnsmasq_2.68.orig.tar.gz
+ubuntu@vaslave2:~/vazuul/dnsmasq/build/dnsmasq-2.68$
