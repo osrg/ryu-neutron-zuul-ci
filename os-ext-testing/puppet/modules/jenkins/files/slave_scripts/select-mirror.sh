@@ -43,6 +43,7 @@ EOF
     cat <<EOF > ~/.pip/pip.conf
 [global]
 index-url = http://pypi.openstack.org/openstack
+extra-index-url = http://pypi.python.org/simple http://tarballs.openstack.org
 EOF
 else
     cat <<EOF > ~/.pip/pip.conf
