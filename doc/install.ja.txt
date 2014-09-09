@@ -111,11 +111,15 @@ CPU: Quad core以上のプロセッサ
                              +----------+||
                               +----------+|
                                +----------+
-                          
 
-ZuulおよびJenkinsが稼働するマスターノード(master)が1台、マスターノードの
-Jenkinsからリモート制御で実際にテストを実行するスレーブノード(slave1～6)が
-6台の合計7つのVMをテストサーバ上に作成します。
+OpenStack master テスト用として
+- ZuulおよびJenkinsが稼働するマスターノード(master)が1台。
+- マスターノードのJenkinsからリモート制御で実際にテストを実行するスレー
+  ブノード(slave1～6)が6台。
+OpenStack stable テスト用として
+- マスターノード(smaster)が1台。
+- スレーブノード(sslave1)が1台。
+の合計9つのVMをテストサーバ上に作成します。
 仮想ネットワークはlibvirtの標準(default/NAT)をそのまま使用します。
 また、ホストのOS並びにVMのOSには、Ubuntu 12.04.4 LTS Server 64bit版を使用
 します。
