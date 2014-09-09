@@ -65,8 +65,8 @@ Jay Pipes氏が公開しているものやOpenStack InfraのものをRyu Project
 自動化していますが、未対応の作業は手動で行う必要があります。
 
 3: http://www.joinfu.com/2014/02/setting-up-an-external-openstack-testing-system/
+   http://www.joinfu.com/2014/02/setting-up-an-openstack-external-testing-system-part-2/
 4: http://ritchey98.blogspot.jp/2014/02/openstack-third-party-testing-how-to.html
-
 
 テストサーバ
 ------------
@@ -95,22 +95,23 @@ CPU: Quad core以上のプロセッサ
 ここで構築する環境は以下の通りです。
 
 
-     <Gateway/DNS>
-           | .1
-    -------+----------+--------------++++++-------------- 192.168.122.0/24
-                      | .10          |||||| .21～26
-                 +----+----+    +----+-----+
-                 | master  |    |  slave1  |+ 
-                 |---------|    |----------||+
-                 |   Zuul  |    | devstack |||+
-                 | Jenkins |    |  tempest ||||+
-                 |     ... |    |      ... |||||+
-                 +---------+    +----------+|||||
-                                 +----------+||||
-                                  +----------+|||
-                                   +----------+||
-                                    +----------+|
-                                     +----------+
+  <Gateway/DNS>
+      | .1   master 用                          stable 用
+  ----+----------+-------------++++++---------------+-------------+----- 192.168.122.0/24
+                 | .10         |||||| .21～26       | .11         | .41  
+            +----+----+   +----+-----+         +----+----+   +----+-----+
+            | master  |   |  slave1  |+        | smaster |   |  sslave1 |
+            |---------|   |----------||+       |---------|   |----------|
+            |   Zuul  |   | devstack |||+      |   Zuul  |   | devstack |
+            | Jenkins |   |  tempest ||||+     | Jenkins |   |  tempest |
+            |     ... |   |      ... |||||+    |     ... |   |      ... |
+            +---------+   +----------+|||||    +---------+   +----------+
+                           +----------+||||
+                            +----------+|||
+                             +----------+||
+                              +----------+|
+                               +----------+
+                          
 
 ZuulおよびJenkinsが稼働するマスターノード(master)が1台、マスターノードの
 Jenkinsからリモート制御で実際にテストを実行するスレーブノード(slave1～6)が
@@ -293,7 +294,7 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
 
     ubuntu@master:~$ cat <<EOF >> /etc/hosts
 
-    192.168.122.10 master
+    192.168.122.10 master zuul
     192.168.122.21 slave1
     192.168.122.22 slave2
     192.168.122.23 slave3
@@ -325,10 +326,40 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
 
 インストール結果を確認します。
 
+* パッケージの確認
+  下記パッケージがインストールされているか確認し、無ければインストール。
+
+    $ pip freeze | egrep "async|smmap"
+    async==0.6.1
+    smmap==0.8.2
+    $
+
+  無ければ pip でインストール
+
+    $ sudo pip install async smmap
+    Downloading/unpacking async
+      Downloading async-0.6.1.tar.gz
+      Running setup.py (path:/tmp/pip_build_root/async/setup.py) egg_info for package async
+    
+    Downloading/unpacking smmap
+      Downloading smmap-0.8.2.tar.gz
+      Running setup.py (path:/tmp/pip_build_root/smmap/setup.py) egg_info for package smmap
+    
+    Installing collected packages: async, smmap
+      Running setup.py install for async
+        building 'async.mod.zlib' extension
+    途中省略
+    
+      Running setup.py install for smmap
+    
+    Successfully installed async smmap
+    Cleaning up...
+    $
+
 * Gerritへのssh接続
 
     ubuntu@master:~$ sudo -u zuul -i
-    zuul@master:~$ ssh -i /var/lib/zuul/ssh/id_rsa neutronryu@review.openstack.org -p 29418        
+    zuul@master:~$ ssh -i /var/lib/zuul/ssh/id_rsa neutronryu@review.openstack.org -p 29418
 
       ****    Welcome to Gerrit Code Review    ****
 
@@ -343,6 +374,8 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
 
 
 * Zuulの設定内容
+
+- /etc/zuul/zuul.conf
 
     ubuntu@master:~$ sudo cat /etc/zuul/zuul.conf
     [gearman]
@@ -374,6 +407,10 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
     zuul_url=http://master/p
     log_config=/etc/zuul/merger-logging.conf
     pidfile=/var/run/zuul-merger/zuul-merger.pid
+    ubuntu@master:~$
+
+
+- /etc/zuul/layout.yaml
 
     ubuntu@master:~$ sudo cat /etc/zuul/layout.yaml
     includes:
@@ -417,6 +454,7 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
         check:
           - check-tempest-dsvm-ryuplugin
           - check-tempest-dsvm-ofagent
+    ubuntu@master:~$
 
 
 * Jenkinsの設定内容
@@ -432,6 +470,7 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
 - ジョブcheck-tempest-dsvm-ryupluginの設定内容を確認します [Fig4]
 - Manage Jenkins(Jenkinsの管理) > Configure System(システムの設定)からSCP
   repository hostsの設定内容を確認します [Fig5]
+  (現在パスワードは使用していません)
 - Manage Jenkins(Jenkinsの管理) > Manage Credentials から認証情報を確認します
   [Fig6]
 
@@ -451,6 +490,11 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
 
     現状のスクリプトでは、スレーブノードからの接続ができなくなり、onlineに
     することができなくなります。
+
+
+*注意*
+    /etc/zuul/layout.yaml の jobs: で指定する結果転送先のアドレスは実際の
+    ログサーバアドレスを設定して下さい。
 
 
 スレーブノードVM
@@ -522,14 +566,18 @@ OSインストール後、ネットワークの設定をDHCPからstatic指定�
     ubuntu@slave1:~$ sudo ovs-appctl version
     ovs-vswitchd (Open vSwitch) 2.1.0
     Compiled Mar 25 2014 19:31:05
+    ubuntu@slave1:~/ryu-neutron-zuul-ci.custom$ dpkg -l | grep dnsmasq
+    ii  dnsmasq                              2.68-1                            Small caching DNS proxy and DHCP/TFTP server
+    ii  dnsmasq-base                         2.68-1                            Small caching DNS proxy and DHCP/TFTP server
+    ii  dnsmasq-utils                        2.68-1                            Utilities for manipulating DHCP leases
     ubuntu@slave1:~$ sudo ls -l /home/jenkins/
     total 12
     drwxr-xr-x 4 jenkins jenkins 4096 Mar 26 15:49 cache
     drwxr-xr-x 2 jenkins jenkins 4096 Mar 26 15:28 devstack-gate
     drwxr-xr-x 2 jenkins jenkins 4096 Mar 26 15:28 ovs2.1.0
-    ubuntu@slave1:~$ ls -l /usr/local/bin/rebuild-node.sh 
+    ubuntu@slave1:~$ ls -l /usr/local/bin/rebuild-node.sh
     -rwxr-xr-x 1 root root 38 Mar 26 15:23 /usr/local/bin/rebuild-node.sh
-    ubuntu@slave1:~$ sudo service jenkins-slave help  
+    ubuntu@slave1:~$ sudo service jenkins-slave help
     jenkins-slave [start|stop|connect|disconnect|online|offline]
     ubuntu@slave1:~$ ls -l /opt/
     total 12
@@ -634,6 +682,7 @@ ssh鍵でログインできるようにauthorized_keysを設定します。
 
     $ sudo mkdir /home/jenkins/.ssh
     $ sudo cp id_rsa.pub /home/jenkins/.ssh/authorized_keys
+    $ sudo chmod og-rw /home/jenkins/.ssh/authorized_keys
     $ sudo chown -R jenkins.jenkins /home/jenkins/.ssh
 
 このid_rsa.pubは、テストサーバのryuci/data/jenkins_key.pubをコピーしたもの
@@ -651,12 +700,12 @@ apacheの設定
 
 ログ公開用ディレクトリを作成します。
 
-    $ sudo mkdir /var/www/ryuci
-    $ sudo chown jenkins.jenkins /var/www/ryuci
+    $ sudo mkdir /data/ryuci
+    $ sudo chown jenkins.jenkins /data/ryuci
 
 ログ公開用ディレクトリの設定を追加します。
 
-    $ sudo vi /etc/apache2/site-enabled/000-default
+    $ sudo vi /etc/apache2/sites-enabled/000-default
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
 
@@ -667,7 +716,10 @@ apacheの設定
                 Order Deny,Allow
                 Deny from all
         </Directory>
-        <Directory /var/www/ryuci>
+
+        Alias /ryuci/icons/ /usr/share/apache2/icons/
+        Alias /ryuci /data/ryuci
+        <Directory /data/ryuci>
                 Options Indexes FollowSymLinks MultiViews
                 AllowOverride Indexes
                 Order Allow,Deny
@@ -694,8 +746,6 @@ apacheの設定
 
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-        Alias /ryuci/icons/ "/usr/share/apache2/icons/"
-
 </VirtualHost>
 
 ログファイルの公開は、単純にmod_autoindexでディレクトリインデックスを
@@ -714,7 +764,7 @@ autoindexでは、
 - ページの先頭に表示されるパス
 
   オプション HeaderName で表示内容を変更します。
-  /var/www/ryuci/theme/header.htmlを以下の内容で作成します。
+  /data/ryuci/theme/header.htmlを以下の内容で作成します。
 
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -786,13 +836,13 @@ autoindexでは、
 
 - アイコンのパス
 
-  /etc/apache2/mod-enabled/autoindex.confの"/icons"をすべて"/ryuci/icons"
+  /etc/apache2/mods-enabled/autoindex.confの"/icons"をすべて"/ryuci/icons"
   に置換します。
 
 - 最上位の親ディレクトリ
 
   /ryuci/ではディレクトリインデックスが表示されないように、以下の内容で
-  /var/www/ryuci/index.htmlを作成します。
+  /data/ryuci/index.htmlを作成します。
 
     <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -872,16 +922,6 @@ Apacheを再起動します。
 Zuulの起動
 ----------
 
-Gearmanクライアントの有効化
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-JenkinsのGearmanクライアントを有効にして、Zuulと連動するようにします。
-
-Manage Jenkins(Jenkinsの管理) > Configure System(システムの設定)からGearman
-Plugin Configを表示し、Enable Gearmanをチェックし、Saveボタンをクリックしま
-す。 [Fig7]
-
-
 zuulとzuul-mergerの起動
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -896,6 +936,20 @@ zuulとzuul-mergerを起動します。
      * zuul is running
     ubuntu@master:~$ sudo service zuul-merger status
      * zuul-merger is running
+
+
+Gearmanクライアントの有効化
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+JenkinsのGearmanクライアントを有効にして、Zuulと連動するようにします。
+
+Manage Jenkins(Jenkinsの管理) > Configure System(システムの設定)からGearman
+Plugin Configを表示し、Enable Gearmanをチェックし、Saveボタンをクリックしま
+す。 [Fig7]
+
+
+zuulの状態確認
+^^^^^^^^^^^^^^
 
 zuulのデバッグログでGerritストリームイベントを処理していることが確認できます。
 
@@ -929,3 +983,90 @@ zuulのデバッグログでGerritストリームイベントを処理してい�
 verifiedの値がスコアになります。本来、failureの場合は-1を与えますが、現状
 では0のままで良いようです。
 
+
+stable 用 master/slave VM の構築
+--------------------------------
+
+stable 用 VM の作成
+^^^^^^^^^^^^^^^^^^^
+
+stable 版の OpenStack に対してもテストを行う必要がある。
+master テスト環境の VM と共用して使い回す事はできるが、お互いの環境に
+よる影響を受ける為、master テスト環境とは別に stable 用の master/slave VM
+を作成する。
+(何らかの方法で初期状態の VM を立ち上げる仕組みを作れば、VM を共用する
+方法がメンテナンスの手間が省ける。)
+
+上述の構築手順に従い新たに master/slave を一つずつ作成。
+
+======== ==============
+ホスト名 IPアドレス
+-------- --------------
+smaster  192.168.122.11
+-------- --------------
+slave1   192.168.122.41
+======== ==============
+
+master VM 内の /etc/zuul/layout.yaml のフィルタを master から stable/{code-name}
+に修正する。下記は stable/icehouse の場合の例(矢印の部分)。
+
+    ubuntu@smaster:~$ cat /etc/zuul/layout.yaml
+    includes:
+      - python-file: openstack_functions.py
+    
+    pipelines:
+      - name: check
+        description: Newly uploaded patchsets enter this pipeline to receive an initial +/-1 Verified vote from Jenkins.
+        failure-message: Build failed. Leave a comment with 'recheck-ryu' to rerun a check. ('recheck' will be ignored.)
+        manager: IndependentPipelineManager
+        precedence: low
+        trigger:
+          gerrit:
+            - event: patchset-created
+              branch: ^stable/icehouse$		<--
+            - event: change-restored
+              branch: ^stable/icehouse$		<--
+            - event: comment-added
+              branch: ^stable/icehouse$		<--
+              comment_filter: (?i)^(Patch Set [0-9]+:\n\n)?\s*recheck-ryu\s*$
+    #        - event: comment-added
+    #          branch: ^stable/icehouse$	<--
+    #          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+    #    success:
+    #      gerrit:
+    #        verified: 1
+    #    failure:
+    #      gerrit:
+    #        verified: 0
+    
+    jobs:
+      - name: ^.*$
+        parameter-function: set_log_url
+        success-pattern: http://192.168.122.11/ryuci/{build.parameters[LOG_PATH]}
+        failure-pattern: http://192.168.122.11/ryuci/{build.parameters[LOG_PATH]}
+      - name: ^check-tempest-dsvm.*$
+        parameter-function: single_use_node
+    
+    projects:
+      - name: openstack/neutron
+        check:
+          - check-tempest-dsvm-ryuplugin
+          - check-tempest-dsvm-ofagent
+    ubuntu@smaster:~$
+
+
+新しい stable への切り替え
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+次の stable 版 release のタイミングで stable 環境の jenkins job を一時
+停止し、下記の方法で stable 用 VM を手動で更新する。
+
+- master 環境の slave VM を clone して stable 環境の slave VM と取り換
+  え ip アドレス等を stable 用に修正する。
+- stable 用 slave を新規に作成。
+
+master VM 内の /etc/zuul/layout.yaml の現在の stable フィルタを新しい
+stable フィルタに修正する。
+
+
+以上
