@@ -31,7 +31,7 @@ class zuul (
   $zuul_url = '',
   $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
   $job_name_in_report = false,
-  $revision = 'master',
+  $revision = '07aefb182d0bb9e7589d65976f8b5a48da679845',
   $statsd_host = '',
   $git_email = '',
   $git_name = '',
