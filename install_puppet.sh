@@ -24,9 +24,15 @@ if which pip > /dev/null; then
   sudo pip uninstall -y setuptools
 fi
 
-curl -O $EZ_SETUP_URL || wget $EZ_SETUP_URL
+curl -O $EZ_SETUP_URL
+if [ ! -f ez_setup.py ]; then
+    wget $EZ_SETUP_URL
+fi
 python ez_setup.py
-curl -O $PIP_GET_PIP_URL || wget $PIP_GET_PIP_URL
+curl -O $PIP_GET_PIP_URL
+if [ ! -f get-pip.py ]; then
+    wget $PIP_GET_PIP_URL
+fi
 python get-pip.py
 
 # Install puppet version 2.7.x from puppetlabs.
