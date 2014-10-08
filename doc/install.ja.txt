@@ -1063,11 +1063,12 @@ master VM 内の /etc/zuul/layout.yaml のフィルタを master から stable/{
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 次の stable 版 release のタイミングで stable 環境の jenkins job を一時
-停止し、下記の方法で stable 用 VM を手動で更新する。
+停止し、下記の何れかの方法で stable 用 VM を手動で更新する。
+複数の stable 環境が必要な場合は新たに該当の stable 環境を追加する。
 
-- master 環境の slave VM を clone して stable 環境の slave VM と取り換
-  え ip アドレス等を stable 用に修正する。
-- stable 用 slave を新規に作成。
+- master 環境の VM を clone して stable 環境用の VM 用意。
+  ip アドレス等を stable 用に修正する。
+- stable 用 VM を新規に作成。
 
 master VM 内の /etc/zuul/layout.yaml の現在の stable フィルタを新しい
 stable フィルタに修正する。
