@@ -35,21 +35,21 @@ EOF
 # use the pypi.openstack.org mirror exclusively
 if grep -x "$org/$project" /opt/requirements/projects.txt 2>&1
 then
-    export TOX_INDEX_URL='http://pypi.openstack.org/openstack'
+    export TOX_INDEX_URL='http://pypi.openstack.org/simple'
     cat <<EOF > ~/.pydistutils.cfg
 [easy_install]
-index_url = http://pypi.openstack.org/openstack
+index_url = http://pypi.openstack.org/simple
 EOF
     cat <<EOF > ~/.pip/pip.conf
 [global]
-index-url = http://pypi.openstack.org/openstack
-extra-index-url = http://pypi.python.org/simple http://tarballs.openstack.org
+index-url = http://pypi.openstack.org/simple
+extra-index-url = http://tarballs.openstack.org http://pypi.python.org/simple
 EOF
 else
     cat <<EOF > ~/.pip/pip.conf
 [global]
 timeout = 60
-index-url = http://pypi.openstack.org/openstack
+index-url = http://pypi.openstack.org/simple
 extra-index-url = http://pypi.python.org/simple
 EOF
 fi
