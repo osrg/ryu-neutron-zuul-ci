@@ -10,7 +10,7 @@ of OpenStack integration tests easy.
 
 ## Usage
 
-To use this playbook, [install Ansible[(http://docs.ansible.com/intro_installation.html)
+To use this playbook, [install Ansible](http://docs.ansible.com/intro_installation.html)
 using your installation method of choice.
 
 Once installed, you can install the external testing platform by
